@@ -1,106 +1,163 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Pill, Trees, Brain, CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-
+import { useRef } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
+import { services } from "@/data/staticData"
 import Link from "next/link"
 
-const services = [
-    {
-        title: "Homoeopathy",
-        description: "Holistically treating the root cause of ailments using dilute natural substances to trigger the body's self-healing mechanisms.",
-        icon: Pill,
-        color: "bg-soft-mint text-deep-teal",
-        benefits: ["Natural & Safe", "No Side Effects", "Personalized Treatment"],
-        href: "/services/homoeopathy"
-    },
-    {
-        title: "Psychotherapy",
-        description: "Supportive guidance and evidence-based techniques to help you navigate mental health challenges and emotional well-being.",
-        icon: Brain,
-        color: "bg-deep-teal text-white",
-        benefits: ["Cognitive Therapy", "Stress Management", "Emotional Support"],
-        href: "/services/psychotherapy"
-    }
-]
-
 export function Services() {
+    const { ref, isVisible } = useScrollReveal(0.1)
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    const scroll = (dir: "left" | "right") => {
+        if (!scrollRef.current) return
+        const amount = 300
+        scrollRef.current.scrollBy({
+            left: dir === "left" ? -amount : amount,
+            behavior: "smooth",
+        })
+    }
+
     return (
-        <section id="services" className="py-24 bg-white relative">
+        <section id="services" ref={ref} style={{ background: "var(--cream)", padding: "96px 0" }}>
             <div className="container mx-auto px-6">
-                <div className="text-center max-w-2xl mx-auto mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="flex items-center justify-center gap-2 text-accent-teal font-semibold mb-3"
-                    >
-                        <Trees className="w-5 h-5" />
-                        <span className="uppercase tracking-widest text-xs">Our Services</span>
-                    </motion.div>
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-5xl font-bold text-deep-teal mb-4"
-                    >
-                        Nurturing Recovery & Growth
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="text-cool-grey text-lg"
-                    >
-                        We combine traditional healing with modern therapeutic practices
-                        to ensure a comprehensive wellness journey.
-                    </motion.p>
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
+                    <div>
+                        <span
+                            className={`block transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                            style={{
+                                fontFamily: "var(--font-dm-sans)",
+                                fontSize: "11px",
+                                letterSpacing: "5px",
+                                textTransform: "uppercase",
+                                color: "var(--mint)",
+                                fontWeight: 500,
+                            }}
+                        >
+                            How We Help
+                        </span>
+                        <h2
+                            className={`mt-4 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                            style={{
+                                fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
+                                fontSize: "clamp(28px, 3.5vw, 40px)",
+                                fontWeight: 600,
+                                color: "var(--forest)",
+                                lineHeight: 1.2,
+                                transitionDelay: "100ms",
+                            }}
+                        >
+                            Healthcare Services
+                        </h2>
+                        <p
+                            className={`mt-3 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                            style={{
+                                fontFamily: "var(--font-dm-sans)",
+                                fontSize: "15px",
+                                color: "var(--muted)",
+                                lineHeight: 1.75,
+                                transitionDelay: "200ms",
+                                maxWidth: "480px",
+                            }}
+                        >
+                            Comprehensive Health Solutions with Expertise in Classical Homoeopathy
+                        </p>
+                    </div>
+
+                    {/* Arrow Buttons */}
+                    <div className="flex gap-3 mt-6 sm:mt-0">
+                        <button
+                            onClick={() => scroll("left")}
+                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer"
+                            style={{ width: "44px", height: "44px" }}
+                            aria-label="Previous"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => scroll("right")}
+                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer"
+                            style={{ width: "44px", height: "44px" }}
+                            aria-label="Next"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-10">
-                    {services.map((service, index) => (
-                        <Link key={service.title} href={service.href} className="group cursor-pointer">
-                            <motion.div
-                                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: index * 0.2 }}
-                                className="relative p-8 rounded-3xl border border-deep-teal/5 bg-[#fafafa] group-hover:bg-white group-hover:shadow-2xl group-hover:shadow-deep-teal/10 transition-all duration-500 overflow-hidden h-full"
-                            >
-                                <div className={`w-16 h-16 rounded-full ${service.color} flex items-center justify-center mb-8 shadow-lg transition-transform duration-500 group-hover:scale-110`}>
-                                    <service.icon className="w-8 h-8" />
-                                </div>
-
-                                <h3 className="text-3xl font-bold text-deep-teal mb-4">{service.title}</h3>
-                                <p className="text-cool-grey text-lg mb-8 leading-relaxed">
-                                    {service.description}
-                                </p>
-
-                                <div className="space-y-4 mb-8">
-                                    {service.benefits.map((benefit) => (
-                                        <div key={benefit} className="flex items-center gap-3 text-deep-teal/80">
-                                            <CheckCircle2 className="w-5 h-5 text-accent-teal" />
-                                            <span className="font-medium">{benefit}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <Button variant={index === 0 ? "outline" : "default"} className="w-full h-12 pointer-events-none group-hover:scale-[1.02] transition-transform">
-                                    Learn More
-                                </Button>
-
-                                {/* Decorative side element */}
-                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                                    <service.icon className="w-24 h-24" />
-                                </div>
-                            </motion.div>
-                        </Link>
+                {/* Carousel */}
+                <div
+                    ref={scrollRef}
+                    className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                >
+                    {services.map((service, i) => (
+                        <div
+                            key={service.name}
+                            className={`shrink-0 snap-start group cursor-pointer overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+                            style={{
+                                width: "280px",
+                                height: "340px",
+                                borderRadius: "16px",
+                                position: "relative",
+                                transitionDelay: `${300 + i * 100}ms`,
+                            }}
+                        >
+                            {/* Background Image */}
+                            <div
+                                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.05]"
+                                style={{ backgroundImage: `url(${service.image})` }}
+                            />
+                            {/* Overlay */}
+                            <div
+                                className="absolute inset-0 transition-all duration-300"
+                                style={{
+                                    background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)",
+                                }}
+                            />
+                            {/* Label */}
+                            <div className="absolute bottom-0 left-0 right-0 p-6">
+                                <h3
+                                    style={{
+                                        fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
+                                        fontSize: "22px",
+                                        fontWeight: 600,
+                                        color: "white",
+                                    }}
+                                >
+                                    {service.name}
+                                </h3>
+                            </div>
+                        </div>
                     ))}
                 </div>
+
+                {/* View All */}
+                <div className="text-center mt-10">
+                    <Link
+                        href="#specializations"
+                        className="inline-flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white"
+                        style={{
+                            border: "2px solid var(--forest)",
+                            color: "var(--forest)",
+                            padding: "12px 28px",
+                            fontFamily: "var(--font-dm-sans)",
+                            fontSize: "14px",
+                            fontWeight: 600,
+                        }}
+                    >
+                        View All →
+                    </Link>
+                </div>
             </div>
+
+            <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
         </section>
     )
 }

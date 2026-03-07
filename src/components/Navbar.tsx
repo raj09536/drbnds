@@ -1,208 +1,172 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import Image from "next/image"
-import { motion, useScroll, useTransform } from "framer-motion"
+import Link from "next/link"
 import { Menu, X, Calendar } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { AppointmentModal } from "@/components/AppointmentModal"
-
-import { useAuth } from "@/hooks/use-auth"
-
-import { useRouter } from "next/navigation"
+import { useAppointment } from "@/context/AppointmentContext"
 
 const navItems = [
-    { name: "Home", href: "/" },
+    { name: "Home", href: "#" },
+    { name: "About", href: "#about" },
     { name: "Services", href: "#services" },
-    { name: "Timings", href: "#timings" },
+    { name: "Doctors", href: "#doctors" },
     { name: "Location", href: "#location" },
+    { name: "Contact", href: "#contact" },
 ]
 
-export function Navbar() {
-    const router = useRouter()
-    const [isOpen, setIsOpen] = React.useState(false)
-    const { scrollY } = useScroll()
-    const { user, role, signOut } = useAuth()
-
-    const handleLogout = async () => {
-        await signOut()
-        setIsOpen(false)
-        router.push("/")
-        router.refresh()
+function smoothScroll(id: string) {
+    if (id === "#") {
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    } else {
+        document.getElementById(id.replace("#", ""))?.scrollIntoView({ behavior: "smooth" })
     }
+}
 
-    const backgroundColor = useTransform(
-        scrollY,
-        [0, 50],
-        ["rgba(252, 250, 242, 0)", "rgba(252, 250, 242, 0.9)"]
-    )
+export function Navbar() {
+    const [isOpen, setIsOpen] = React.useState(false)
+    const [scrolled, setScrolled] = React.useState(false)
+    const { openModal } = useAppointment()
 
-    const backdropBlur = useTransform(
-        scrollY,
-        [0, 50],
-        ["blur(0px)", "blur(12px)"]
-    )
-
-    const borderOpacity = useTransform(
-        scrollY,
-        [0, 50],
-        ["rgba(0, 77, 77, 0)", "rgba(0, 77, 77, 0.1)"]
-    )
+    React.useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50)
+        }
+        window.addEventListener("scroll", handleScroll, { passive: true })
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
 
     return (
-        <motion.nav
+        <nav
+            className="sticky top-0 z-50 bg-white transition-shadow duration-300"
             style={{
-                backgroundColor,
-                backdropFilter: backdropBlur,
-                borderBottom: `1px solid ${borderOpacity}`
+                boxShadow: scrolled ? "0 2px 20px rgba(0,0,0,0.08)" : "none",
             }}
-            className="fixed top-0 left-0 right-0 z-50 py-4 transition-all"
         >
-            <div className="container mx-auto px-6 flex items-center justify-between">
-                <Link
-                    href="/"
-                    className="flex items-center"
-                >
+            <div className="container mx-auto px-6 flex items-center justify-between" style={{ height: "72px" }}>
+                {/* Logo */}
+                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center shrink-0 cursor-pointer bg-transparent border-none p-0">
                     <Image
                         src="/logo.jpeg"
                         alt="Dr. BND Clinic Logo"
                         width={180}
-                        height={60}
-                        className="object-contain cursor-pointer h-10 w-auto md:h-12"
+                        height={50}
+                        className="object-contain cursor-pointer"
+                        style={{ height: "50px", width: "auto" }}
                         priority
                     />
-                </Link>
+                </button>
 
-                {/* Desktop Nav */}
-                <div className="hidden md:flex items-center gap-6">
-                    <div className="flex items-center gap-8 mr-4">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className="text-sm font-medium text-cool-grey hover:text-deep-teal transition-colors"
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </div>
+                {/* Desktop Nav Links */}
+                <div className="hidden lg:flex items-center gap-8">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.name}
+                            onClick={() => smoothScroll(item.href)}
+                            className="relative text-charcoal hover:text-forest transition-colors duration-200 bg-transparent border-none cursor-pointer group"
+                            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 500, padding: 0 }}
+                        >
+                            {item.name}
+                            <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-gold transition-all duration-300 group-hover:w-full" />
+                        </button>
+                    ))}
+                </div>
 
-                    <div className="flex items-center gap-3 border-l border-deep-teal/10 pl-6 h-8">
-                        {user ? (
-                            <>
-                                <Link href={role === 'doctor' ? "/doctor-dashboard" : "/patient-dashboard"}>
-                                    <Button variant="outline" size="sm" className="h-9">
-                                        Dashboard
-                                    </Button>
-                                </Link>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleLogout}
-                                    className="text-cool-grey hover:text-destructive transition-colors"
-                                >
-                                    Log out
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Link href="/login">
-                                    <Button variant="ghost" size="sm" className="text-deep-teal font-medium">
-                                        Login
-                                    </Button>
-                                </Link>
-                                <Link href="/signup">
-                                    <Button variant="premium-glow" size="sm">
-                                        Sign Up
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-                        <div className="w-px h-4 bg-deep-teal/10 mx-1" />
-                        <AppointmentModal>
-                            <Button size="sm" className="bg-deep-teal hover:bg-deep-teal/90 text-white gap-2 h-9 px-4">
-                                <Calendar className="w-4 h-4" />
-                                <span className="hidden lg:inline">Book Appointment</span>
-                                <span className="lg:hidden">Book</span>
-                            </Button>
-                        </AppointmentModal>
-                    </div>
+                {/* Desktop CTA — opens modal */}
+                <div className="hidden lg:flex items-center gap-3">
+                    <Link href="/login">
+                        <button
+                            className="cursor-pointer transition-all duration-200 hover:bg-forest hover:text-white"
+                            style={{
+                                padding: "9px 20px",
+                                borderRadius: "8px",
+                                border: "1.5px solid var(--forest)",
+                                background: "transparent",
+                                color: "var(--forest)",
+                                fontFamily: "var(--font-dm-sans)",
+                                fontSize: "13px",
+                                fontWeight: 600,
+                                letterSpacing: "0.3px",
+                            }}
+                        >
+                            Staff Login
+                        </button>
+                    </Link>
+                    <button
+                        onClick={() => openModal()}
+                        className="flex items-center gap-2 bg-forest text-white rounded-lg hover:bg-sage transition-colors duration-200 cursor-pointer"
+                        style={{ padding: "10px 22px", fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 600, border: "none" }}
+                    >
+                        <Calendar className="w-4 h-4" />
+                        Book Appointment
+                    </button>
                 </div>
 
                 {/* Mobile Toggle */}
-                <div className="md:hidden flex items-center gap-3">
-                    {user && (
-                        <Link href={role === 'doctor' ? "/doctor-dashboard" : "/patient-dashboard"}>
-                            <Button variant="outline" size="sm" className="h-9 px-3">
-                                Dashboard
-                            </Button>
-                        </Link>
-                    )}
+                <div className="lg:hidden flex items-center gap-3">
+                    <button
+                        onClick={() => openModal()}
+                        className="flex items-center gap-1.5 bg-forest text-white rounded-lg cursor-pointer"
+                        style={{ padding: "8px 14px", fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 600, border: "none" }}
+                    >
+                        <Calendar className="w-3.5 h-3.5" />
+                        Book
+                    </button>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="p-2 text-deep-teal focus:outline-none bg-soft-mint/50 rounded-full cursor-pointer hover:bg-soft-mint transition-colors"
+                        className="p-2 text-forest focus:outline-none bg-cream rounded-lg cursor-pointer hover:bg-gold-light transition-colors duration-200"
                         aria-label="Toggle Menu"
                     >
-                        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
-            <motion.div
-                initial={false}
-                animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-                className="md:hidden overflow-hidden bg-warm-cream border-t border-deep-teal/5"
+            {/* Mobile Menu Drawer */}
+            <div
+                className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
             >
-                <div className="px-6 py-8 flex flex-col gap-6">
+                <div className="px-6 py-6 bg-white border-t border-gold-light/50 flex flex-col gap-1">
                     {navItems.map((item) => (
-                        <Link
+                        <button
                             key={item.name}
-                            href={item.href}
-                            onClick={() => setIsOpen(false)}
-                            className="text-lg font-medium text-cool-grey hover:text-deep-teal"
+                            onClick={() => { smoothScroll(item.href); setIsOpen(false); }}
+                            className="text-charcoal/80 hover:text-forest hover:bg-cream px-4 py-3 rounded-xl transition-all duration-200 bg-transparent border-none cursor-pointer text-left"
+                            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", fontWeight: 500 }}
                         >
                             {item.name}
-                        </Link>
+                        </button>
                     ))}
-
-                    <div className="pt-4 border-t border-deep-teal/5 flex flex-col gap-4">
-                        {user ? (
-                            <Button
-                                variant="ghost"
-                                className="w-full h-12 text-destructive justify-start px-0"
-                                onClick={handleLogout}
-                            >
-                                Log out from Account
-                            </Button>
-                        ) : (
-                            <div className="grid grid-cols-2 gap-4">
-                                <Link href="/login" onClick={() => setIsOpen(false)}>
-                                    <Button variant="outline" className="w-full h-12 text-base">
-                                        Login
-                                    </Button>
-                                </Link>
-                                <Link href="/signup" onClick={() => setIsOpen(false)}>
-                                    <Button variant="premium-glow" className="w-full h-12 text-base">
-                                        Sign Up
-                                    </Button>
-                                </Link>
-                            </div>
-                        )}
-
-                        <AppointmentModal>
-                            <Button
-                                className="w-full h-14 text-lg gap-2 bg-deep-teal text-white shadow-xl shadow-deep-teal/10"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                <Calendar className="w-5 h-5" />
-                                Book Appointment
-                            </Button>
-                        </AppointmentModal>
+                    <div className="mt-4 pt-4 border-t border-gold-light/30 flex flex-col gap-2">
+                        <button
+                            onClick={() => { openModal(); setIsOpen(false); }}
+                            className="w-full flex items-center justify-center gap-2 bg-forest text-white py-3.5 rounded-xl hover:bg-sage transition-colors duration-200 cursor-pointer"
+                            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", fontWeight: 600, border: "none" }}
+                        >
+                            <Calendar className="w-4 h-4" />
+                            Book Appointment
+                        </button>
+                        <Link
+                            href="/login"
+                            onClick={() => setIsOpen(false)}
+                            className="block text-center"
+                            style={{
+                                padding: "11px",
+                                border: "1.5px solid var(--forest)",
+                                borderRadius: "8px",
+                                color: "var(--forest)",
+                                fontFamily: "var(--font-dm-sans)",
+                                fontSize: "14px",
+                                fontWeight: 600,
+                                marginTop: "4px",
+                            }}
+                        >
+                            Staff Login
+                        </Link>
                     </div>
                 </div>
-            </motion.div>
-        </motion.nav>
+            </div>
+        </nav>
     )
 }

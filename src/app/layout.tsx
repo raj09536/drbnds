@@ -1,28 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Inter, Playfair_Display } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import { AppointmentProvider } from "@/context/AppointmentContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Dr. BND's Homoeopathic & Psychotherapy Clinic",
-  description: "Experience holistic healing and mental wellness with Dr. BND in Dehradun. Specialized in Homoeopathy and Psychotherapy.",
+  title: "Dr. BND's Homoeopathic & Psychotherapy Clinic | Dehradun",
+  description:
+    "Experience holistic healing and mental wellness with Dr. BND in Dehradun. Specialized in classical Homoeopathy and compassionate Psychotherapy across two clinic locations.",
 };
-
-import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -32,12 +33,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${inter.variable} ${playfair.variable} antialiased font-sans`}
+        className={`${cormorant.variable} ${dmSans.variable} antialiased font-sans`}
       >
-        {children}
+        <AppointmentProvider>
+          {children}
+        </AppointmentProvider>
         <Toaster position="top-center" expand={false} richColors />
       </body>
     </html>
   );
 }
-

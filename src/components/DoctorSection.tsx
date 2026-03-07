@@ -1,123 +1,233 @@
 "use client"
 
-import { motion, Variants } from "framer-motion"
 import Image from "next/image"
-import { Award, BookOpen, Quote } from "lucide-react"
+import { Phone, Video, Building2, ArrowRight, Calendar, MapPin } from "lucide-react"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
+import { useAppointment } from "@/context/AppointmentContext"
+import { doctors } from "@/data/staticData"
 
-export function DoctorSection() {
-    const containerVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.3,
-                delayChildren: 0.2
-            }
-        }
-    }
-
-    const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.8, ease: "easeOut" }
-        }
-    }
+export function Doctors() {
+    const { ref, isVisible } = useScrollReveal(0.1)
+    const { openModal } = useAppointment()
 
     return (
-        <section id="about" className="py-24 bg-soft-mint/30 relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-accent-teal/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-deep-teal/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2" />
-
+        <section id="doctors" ref={ref} style={{ background: "white", padding: "96px 0" }}>
             <div className="container mx-auto px-6">
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    className="grid lg:grid-cols-2 gap-16 items-center"
-                >
-                    {/* Left Side: Photo Placeholder */}
-                    <motion.div variants={itemVariants} className="relative group">
-                        <div className="relative aspect-4/5 md:aspect-square max-w-md mx-auto">
-                            {/* Decorative frame */}
-                            <div className="absolute inset-0 bg-deep-teal rounded-[3rem] rotate-3 transition-transform group-hover:rotate-6 duration-500" />
+                {/* Header */}
+                <div className="text-center max-w-2xl mx-auto mb-16">
+                    <span
+                        className={`block transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                        style={{
+                            fontFamily: "var(--font-dm-sans)",
+                            fontSize: "11px",
+                            letterSpacing: "5px",
+                            textTransform: "uppercase",
+                            color: "var(--mint)",
+                            fontWeight: 500,
+                        }}
+                    >
+                        Expert Care
+                    </span>
+                    <h2
+                        className={`mt-4 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                        style={{
+                            fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
+                            fontSize: "clamp(28px, 3.5vw, 40px)",
+                            fontWeight: 600,
+                            color: "var(--forest)",
+                            lineHeight: 1.2,
+                            transitionDelay: "100ms",
+                        }}
+                    >
+                        Meet Your Healers
+                    </h2>
+                </div>
 
-                            {/* Main Image Container */}
-                            <div className="absolute inset-0 bg-white rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl transition-transform group-hover:-translate-y-2 group-hover:-translate-x-2 duration-500">
-                                <Image
-                                    src="/doctor.jpeg"
-                                    alt="Dr. B. N. Dwivedy"
-                                    fill
-                                    className="object-cover"
-                                    priority
-                                />
-                                {/* Glassmorphism Badge */}
-                                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-3xl bg-black/20 backdrop-blur-md border border-white/30 text-white">
-                                    <p className="text-sm font-medium">Expert in Classical Homoeopathy</p>
-                                    <p className="text-xs opacity-80">& Clinical Psychotherapy</p>
-                                </div>
-                            </div>
-
-                            {/* Floating Stats */}
-                            <motion.div
-                                animate={{ y: [0, -10, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute -top-6 -right-6 p-4 bg-white rounded-2xl shadow-xl flex items-center gap-3 border border-deep-teal/5"
+                {/* Doctor Cards */}
+                <div className="flex flex-col gap-8">
+                    {doctors.map((doctor, idx) => {
+                        const isReversed = idx % 2 !== 0
+                        return (
+                            <div
+                                key={doctor.id}
+                                className={`overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                                    }`}
+                                style={{
+                                    border: "1px solid rgba(0,0,0,0.06)",
+                                    borderRadius: "16px",
+                                    transitionDelay: `${300 + idx * 200}ms`,
+                                }}
                             >
-                                <div className="w-10 h-10 rounded-full bg-soft-mint flex items-center justify-center text-deep-teal text-xl font-bold">
-                                    <Award className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <p className="text-deep-teal font-bold leading-none">25+ Years</p>
-                                    <p className="text-[10px] text-cool-grey font-medium uppercase tracking-wider">Experience</p>
-                                </div>
-                            </motion.div>
-                        </div>
-                    </motion.div>
+                                <div className={`flex flex-col ${isReversed ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
+                                    {/* Image Side */}
+                                    <div className="relative lg:w-[40%]" style={{ minHeight: "400px" }}>
+                                        <Image
+                                            src={doctor.photo}
+                                            alt={doctor.name}
+                                            fill
+                                            className="object-cover"
+                                            style={{
+                                                borderRadius: isReversed
+                                                    ? "0 16px 16px 0"
+                                                    : "16px 0 0 16px",
+                                            }}
+                                        />
+                                    </div>
 
-                    {/* Right Side: Bio */}
-                    <div className="space-y-8">
-                        <motion.div variants={itemVariants}>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-teal/10 text-accent-teal text-xs font-bold tracking-widest uppercase mb-4">
-                                <BookOpen className="w-4 h-4" />
-                                <span>Meet Your Healer</span>
-                            </div>
-                            <h2 className="text-4xl md:text-5xl font-bold text-deep-teal mb-6 leading-tight">
-                                Dr. B. N. Dwivedy
-                            </h2>
-                            <div className="relative">
-                                <Quote className="absolute -top-4 -left-6 w-12 h-12 text-accent-teal/10 -scale-x-100" />
-                                <p className="text-xl text-cool-grey leading-relaxed italic pr-4">
-                                    &quot;True healing begins when we address both the physical symptoms and the emotional landscape.
-                                    My mission is to restore balance and vitality through a compassionate, holistic approach.&quot;
-                                </p>
-                            </div>
-                        </motion.div>
+                                    {/* Content Side */}
+                                    <div className="lg:w-[60%]" style={{ padding: "40px", background: "#f8f9fa" }}>
+                                        <span
+                                            style={{
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "11px",
+                                                letterSpacing: "4px",
+                                                textTransform: "uppercase",
+                                                color: "var(--mint)",
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            About Doctor
+                                        </span>
 
-                        <motion.div variants={itemVariants} className="space-y-6">
-                            <p className="text-lg text-cool-grey leading-relaxed">
-                                With over two decades of experience, Dr. Dwivedy has pioneered an integrated model of healthcare
-                                that bridges the gap between homoeopathic medicine and modern psychological counseling.
-                                His practice in Dehradun is known for its empathetic environment where every patient&apos;s
-                                personal journey is respected and understood.
-                            </p>
+                                        <h3
+                                            className="mt-3"
+                                            style={{
+                                                fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
+                                                fontSize: "36px",
+                                                fontWeight: 600,
+                                                color: "var(--forest)",
+                                                lineHeight: 1.2,
+                                            }}
+                                        >
+                                            {doctor.name}
+                                        </h3>
 
-                            <div className="grid sm:grid-cols-2 gap-6 pt-4">
-                                <div className="p-4 rounded-3xl bg-white border border-deep-teal/5 shadow-sm">
-                                    <h4 className="font-bold text-deep-teal mb-2">Homoeopathy</h4>
-                                    <p className="text-sm text-cool-grey leading-snug">Classical protocols for chronic and acute ailments with a focus on long-term immunity.</p>
-                                </div>
-                                <div className="p-4 rounded-3xl bg-white border border-deep-teal/5 shadow-sm">
-                                    <h4 className="font-bold text-deep-teal mb-2">Psychotherapy</h4>
-                                    <p className="text-sm text-cool-grey leading-snug">Cognitive and behavioral support to manage stress, anxiety, and emotional transitions.</p>
+                                        <div className="flex flex-wrap gap-2 mt-4">
+                                            {doctor.qualifications.map((q) => (
+                                                <span
+                                                    key={q}
+                                                    className="rounded-full"
+                                                    style={{
+                                                        background: "var(--cream)",
+                                                        border: "1px solid var(--gold-light)",
+                                                        padding: "4px 14px",
+                                                        fontFamily: "var(--font-dm-sans)",
+                                                        fontSize: "13px",
+                                                        color: "var(--forest)",
+                                                        fontWeight: 500,
+                                                    }}
+                                                >
+                                                    {q}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-5 mt-5">
+                                            <span
+                                                className="flex items-center gap-1.5"
+                                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "var(--muted)" }}
+                                            >
+                                                <Calendar className="w-3.5 h-3.5" /> {doctor.years_exp}+ Years Experience
+                                            </span>
+                                            <span
+                                                className="flex items-center gap-1.5"
+                                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "var(--muted)" }}
+                                            >
+                                                📋 {doctor.specialization}
+                                            </span>
+                                            <span
+                                                className="flex items-center gap-1.5"
+                                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "var(--muted)" }}
+                                            >
+                                                <MapPin className="w-3.5 h-3.5" /> {doctor.clinic_name.split("—")[0].trim()}
+                                            </span>
+                                        </div>
+
+                                        <p
+                                            className="mt-5"
+                                            style={{
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "15px",
+                                                color: "var(--muted)",
+                                                lineHeight: 1.75,
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 4,
+                                                WebkitBoxOrient: "vertical",
+                                                overflow: "hidden",
+                                            }}
+                                        >
+                                            {doctor.bio}
+                                        </p>
+
+                                        {/* Action Buttons Row */}
+                                        <div className="flex flex-wrap gap-3 mt-6">
+                                            <a
+                                                href={`tel:${doctor.phone.replace(/[^+\d]/g, "")}`}
+                                                className="flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white hover:border-forest"
+                                                style={{
+                                                    border: "1px solid var(--sage)",
+                                                    color: "var(--forest)",
+                                                    padding: "8px 16px",
+                                                    fontFamily: "var(--font-dm-sans)",
+                                                    fontSize: "13px",
+                                                    fontWeight: 500,
+                                                }}
+                                            >
+                                                <Phone className="w-3.5 h-3.5" /> Call
+                                            </a>
+                                            <button
+                                                className="flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white hover:border-forest cursor-pointer"
+                                                style={{
+                                                    border: "1px solid var(--sage)",
+                                                    color: "var(--forest)",
+                                                    padding: "8px 16px",
+                                                    fontFamily: "var(--font-dm-sans)",
+                                                    fontSize: "13px",
+                                                    fontWeight: 500,
+                                                    background: "transparent",
+                                                }}
+                                            >
+                                                <Video className="w-3.5 h-3.5" /> Video Call
+                                            </button>
+                                            <button
+                                                className="flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white hover:border-forest cursor-pointer"
+                                                style={{
+                                                    border: "1px solid var(--sage)",
+                                                    color: "var(--forest)",
+                                                    padding: "8px 16px",
+                                                    fontFamily: "var(--font-dm-sans)",
+                                                    fontSize: "13px",
+                                                    fontWeight: 500,
+                                                    background: "transparent",
+                                                }}
+                                            >
+                                                <Building2 className="w-3.5 h-3.5" /> In Person
+                                            </button>
+                                        </div>
+
+                                        {/* Book Button — opens modal with pre-selected doctor */}
+                                        <button
+                                            onClick={() => openModal(doctor.id)}
+                                            className="w-full flex items-center justify-center gap-2 mt-6 rounded-lg cursor-pointer transition-all duration-200 hover:brightness-110"
+                                            style={{
+                                                background: "var(--gold)",
+                                                color: "var(--forest)",
+                                                padding: "14px",
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "14px",
+                                                fontWeight: 600,
+                                                border: "none",
+                                            }}
+                                        >
+                                            Book an Appointment with {doctor.name.split(".").pop()?.trim()}
+                                            <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
+                        )
+                    })}
+                </div>
             </div>
         </section>
     )
