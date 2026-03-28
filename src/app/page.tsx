@@ -7,12 +7,13 @@ import { Specializations } from "@/components/sections/Specializations"
 import { Services } from "@/components/Services"
 import { Doctors } from "@/components/DoctorSection"
 import { Testimonials } from "@/components/sections/Testimonials"
+import { CaseFiles } from '@/components/sections/CaseFiles'
 import { Gallery } from "@/components/sections/Gallery"
 import { FAQ } from "@/components/sections/FAQ"
 import { Locations } from "@/components/sections/Locations"
 import { WorkingHours } from "@/components/Timings"
 import { ContactForm } from "@/components/sections/ContactForm"
-import { FeedbackForm } from "@/components/sections/FeedbackForm"
+import { TestimonialsForm } from "@/components/sections/TestimonialsForm"
 import { Footer } from "@/components/Footer"
 
 export default function Home() {
@@ -27,7 +28,8 @@ export default function Home() {
       <Services />
       <Doctors />
       <Testimonials />
-      <FeedbackForm />
+      <CaseFiles />
+      <TestimonialsForm />
       <Gallery />
       <FAQ />
       <Locations />

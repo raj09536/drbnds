@@ -3,6 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, Calendar } from "lucide-react"
 import { useAppointment } from "@/context/AppointmentContext"
 
@@ -11,22 +12,33 @@ const navItems = [
     { name: "About", href: "#about" },
     { name: "Services", href: "#services" },
     { name: "Doctors", href: "#doctors" },
+    { name: "Case Files", href: "/case-files" }, // External Link
     { name: "Location", href: "#location" },
     { name: "Contact", href: "#contact" },
 ]
-
-function smoothScroll(id: string) {
-    if (id === "#") {
-        window.scrollTo({ top: 0, behavior: "smooth" })
-    } else {
-        document.getElementById(id.replace("#", ""))?.scrollIntoView({ behavior: "smooth" })
-    }
-}
 
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
     const [scrolled, setScrolled] = React.useState(false)
     const { openModal } = useAppointment()
+    const router = useRouter()
+    const pathname = usePathname()
+
+    const handleNavClick = (href: string) => {
+        setIsOpen(false)
+        
+        if (href.startsWith("#")) {
+            if (pathname !== "/") {
+                router.push("/" + href)
+            } else {
+                if (href === "#") {
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                } else {
+                    document.getElementById(href.replace("#", ""))?.scrollIntoView({ behavior: "smooth" })
+                }
+            }
+        }
+    }
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -45,7 +57,16 @@ export function Navbar() {
         >
             <div className="container mx-auto px-6 flex items-center justify-between" style={{ height: "72px" }}>
                 {/* Logo */}
-                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center shrink-0 cursor-pointer bg-transparent border-none p-0">
+                <button 
+                  onClick={() => {
+                    if (pathname === "/") {
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                    } else {
+                        router.push("/")
+                    }
+                  }} 
+                  className="flex items-center shrink-0 cursor-pointer bg-transparent border-none p-0"
+                >
                     <Image
                         src="/logo.jpeg"
                         alt="Dr. BND Clinic Logo"
@@ -60,19 +81,31 @@ export function Navbar() {
                 {/* Desktop Nav Links */}
                 <div className="hidden lg:flex items-center gap-8">
                     {navItems.map((item) => (
-                        <button
-                            key={item.name}
-                            onClick={() => smoothScroll(item.href)}
-                            className="relative text-charcoal hover:text-forest transition-colors duration-200 bg-transparent border-none cursor-pointer group"
-                            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 500, padding: 0 }}
-                        >
-                            {item.name}
-                            <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-gold transition-all duration-300 group-hover:w-full" />
-                        </button>
+                        item.href.startsWith("#") ? (
+                            <button
+                                key={item.name}
+                                onClick={() => handleNavClick(item.href)}
+                                className="relative text-charcoal hover:text-forest transition-colors duration-200 bg-transparent border-none cursor-pointer group"
+                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 500, padding: 0 }}
+                            >
+                                {item.name}
+                                <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-gold transition-all duration-300 group-hover:w-full" />
+                            </button>
+                        ) : (
+                            <Link
+                                key={item.name}
+                                href={item.href}
+                                className="relative text-charcoal hover:text-forest transition-colors duration-200 group"
+                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 500 }}
+                            >
+                                {item.name}
+                                <span className="absolute bottom-[-4px] left-0 w-0 h-[2px] bg-gold transition-all duration-300 group-hover:w-full" />
+                            </Link>
+                        )
                     ))}
                 </div>
 
-                {/* Desktop CTA — opens modal */}
+                {/* Desktop CTA */}
                 <div className="hidden lg:flex items-center gap-3">
                     <Link href="/login">
                         <button
@@ -124,19 +157,31 @@ export function Navbar() {
 
             {/* Mobile Menu Drawer */}
             <div
-                className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+                className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                     }`}
             >
                 <div className="px-6 py-6 bg-white border-t border-gold-light/50 flex flex-col gap-1">
                     {navItems.map((item) => (
-                        <button
-                            key={item.name}
-                            onClick={() => { smoothScroll(item.href); setIsOpen(false); }}
-                            className="text-charcoal/80 hover:text-forest hover:bg-cream px-4 py-3 rounded-xl transition-all duration-200 bg-transparent border-none cursor-pointer text-left"
-                            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", fontWeight: 500 }}
-                        >
-                            {item.name}
-                        </button>
+                        item.href.startsWith("#") ? (
+                            <button
+                                key={item.name}
+                                onClick={() => handleNavClick(item.href)}
+                                className="text-charcoal/80 hover:text-forest hover:bg-cream px-4 py-3 rounded-xl transition-all duration-200 bg-transparent border-none cursor-pointer text-left"
+                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", fontWeight: 500 }}
+                            >
+                                {item.name}
+                            </button>
+                        ) : (
+                            <Link
+                                key={item.name}
+                                href={item.href}
+                                onClick={() => setIsOpen(false)}
+                                className="text-charcoal/80 hover:text-forest hover:bg-cream px-4 py-3 rounded-xl transition-all duration-200 text-left block"
+                                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", fontWeight: 500 }}
+                            >
+                                {item.name}
+                            </Link>
+                        )
                     ))}
                     <div className="mt-4 pt-4 border-t border-gold-light/30 flex flex-col gap-2">
                         <button

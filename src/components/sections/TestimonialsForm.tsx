@@ -17,7 +17,7 @@ interface Doctor {
 }
 
 /* ─── Component ──────────────────────────────────────────────────────── */
-export function FeedbackForm() {
+export function TestimonialsForm() {
     const { ref, isVisible } = useScrollReveal(0.15)
     const [doctors, setDoctors] = useState<Doctor[]>([])
     const [selectedDoctorId, setSelectedDoctorId] = useState<number | "">("")
@@ -61,8 +61,8 @@ export function FeedbackForm() {
         setLoading(false)
 
         if (error) {
-            console.error("Feedback error:", error)
-            toast.error("Failed to submit feedback. Please try again.")
+            console.error("Testimonial error:", error)
+            toast.error("Failed to submit testimonial. Please try again.")
         } else {
             setSubmitted(true)
             setName("")
@@ -103,7 +103,7 @@ export function FeedbackForm() {
                             transitionDelay: "100ms",
                         }}
                     >
-                        Share Your Feedback
+                        Share Your Experience
                     </h2>
                     <p
                         className={`mt-3 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -117,7 +117,7 @@ export function FeedbackForm() {
                             transitionDelay: "200ms",
                         }}
                     >
-                        Your feedback helps us improve and inspires others to seek natural healing. Approved reviews will be featured on our website.
+                        Your testimonial helps us improve and inspires others to seek natural healing. Approved reviews will be featured on our website.
                     </p>
                 </div>
 
@@ -146,7 +146,7 @@ export function FeedbackForm() {
                                 Thank You!
                             </h3>
                             <p className="mt-3" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", color: "var(--muted)", lineHeight: 1.7, maxWidth: "380px", margin: "12px auto 0" }}>
-                                Your feedback has been submitted for review. Once approved by our team, it will be featured in our Patient Stories section.
+                                Your testimonial has been submitted for review. Once approved by our team, it will be featured in our Patient Stories section.
                             </p>
                             <button
                                 onClick={() => setSubmitted(false)}
@@ -320,11 +320,11 @@ export function FeedbackForm() {
                                     boxShadow: "0 4px 16px rgba(26,58,42,0.2)",
                                 }}
                             >
-                                {loading ? "Submitting..." : "Submit Feedback →"}
+                                {loading ? "Submitting..." : "Submit Testimonial →"}
                             </button>
 
                             <p className="text-center mt-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--muted)" }}>
-                                🔒 Your feedback will be reviewed before being published.
+                                🔒 Your testimonial will be reviewed before being published.
                             </p>
                         </form>
                     )}
