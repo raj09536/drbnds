@@ -200,3 +200,27 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--forest);
 }
+
+/* ── Button Utilities ── */
+.view-all-btn {
+  border: 1.5px solid #2D5016;
+  color: #2D5016;
+  background: transparent;
+  padding: 12px 28px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.view-all-btn:hover {
+  background: #2D5016;
+  color: #ffffff !important;
+}

@@ -123,16 +123,7 @@ export function Gallery() {
                 <div className="text-center mt-10">
                     <button
                         onClick={() => router.push('/gallery')}
-                        className="inline-flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white cursor-pointer"
-                        style={{
-                            border: "2px solid var(--forest)",
-                            color: "var(--forest)",
-                            padding: "12px 28px",
-                            fontFamily: "var(--font-dm-sans)",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                            background: "transparent",
-                        }}
+                        className="view-all-btn"
                     >
                         View All →
                     </button>

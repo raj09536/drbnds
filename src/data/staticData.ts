@@ -102,72 +102,52 @@ export const stats = [
 ];
 
 export const specializations = [
-    {
-        icon: "🌿",
-        name: "Classical Homoeopathy",
-        desc: "Root-cause treatment using natural dilute substances",
-    },
-    {
-        icon: "🧠",
-        name: "Psychotherapy",
-        desc: "CBT and counseling for mental health and emotional balance",
-    },
-    {
-        icon: "🤱",
-        name: "Fertility & Infertility",
-        desc: "Holistic homoeopathic support for reproductive health",
-    },
-    {
-        icon: "🦋",
-        name: "Thyroid Disorders",
-        desc: "Natural regulation of thyroid function",
-    },
-    {
-        icon: "✨",
-        name: "Skin Conditions",
-        desc: "Chronic skin issues treated from within",
-    },
-    {
-        icon: "🦴",
-        name: "Joint & Bone Health",
-        desc: "RA, arthritis, and orthopaedic complaints",
-    },
-    {
-        icon: "💙",
-        name: "Anxiety & Depression",
-        desc: "Compassionate mental health support",
-    },
-    {
-        icon: "🍃",
-        name: "Lifestyle Disorders",
-        desc: "Diabetes, hypertension, obesity management",
-    },
+    { icon: '🤧', title: 'Allergies', desc: 'Skin allergies, food allergies, dust allergies aur sabhi prakar ki allergic conditions ka homoeopathic ilaj.' },
+    { icon: '👶', title: 'Children Problems', subtitle: '(Paediatric)', desc: 'Bacchon ki sabhi bimariyon ka safe aur effective homoeopathic treatment — bina side effects ke.' },
+    { icon: '👴', title: 'Old Age Problems', subtitle: '(Geriatrics)', desc: 'Buzurgon ki takleefon jaise joint pain, weakness, memory issues ka gentle homoeopathic ilaj.' },
+    { icon: '👩', title: 'Female Problems', subtitle: '(Gynaecology)', desc: 'Mahilaon ki sabhi samasyon — PCOD, irregular periods, leucorrhoea ka visheshagya upchar.' },
+    { icon: '✨', title: 'Beauty Problems', desc: 'Acne, hair fall, pigmentation, skin problems ka andar se ilaj — natural aur long lasting results.' },
+    { icon: '🧠', title: 'Mind / Mental Problems', desc: 'Anxiety, depression, stress, insomnia aur sabhi mansik samasyon ka homoeopathic samadhan.' },
+    { icon: '⚡', title: 'Hormonal / Endocrinal Problems', desc: 'Thyroid, diabetes, hormonal imbalance ka root cause se homoeopathic upchar.' },
+    { icon: '🦴', title: 'Bones & Joint Problems', desc: 'Arthritis, back pain, cervical, knee pain — sabhi haddi aur jodo ki takleefon ka ilaj.' },
+    { icon: '🧬', title: 'Neurological Problems', desc: 'Migraine, nerve pain, numbness aur sabhi neurological conditions ka homoeopathic treatment.' },
+    { icon: '🫘', title: 'Kidney Problems', desc: 'Kidney stones, UTI, kidney function issues ka safe homoeopathic management.' },
+    { icon: '🫃', title: 'Gastro / Gastric Problems', desc: 'Acidity, IBS, constipation, gas, digestive disorders ka permanent homoeopathic ilaj.' },
+    { icon: '👂', title: 'Ear / Nose / Throat', desc: 'Sinusitis, tonsils, ear infections, nasal problems ka homoeopathic upchar.' },
+    { icon: '🫁', title: 'Respiratory Problems', desc: 'Asthma, bronchitis, chronic cough, breathing issues ka root se homoeopathic ilaj.' },
+    { icon: '🌿', title: 'Lifestyle Problems', desc: 'Obesity, fatigue, immunity issues, lifestyle disorders ka holistic homoeopathic samadhan.' },
 ];
 
 export const services = [
     {
-        name: "Diet & Counselling",
-        image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80",
+        title: 'All Type Consultation',
+        desc: 'In-clinic, online aur phone consultation available — apni suvidha ke anusaar doctor se milein.',
+        icon: '🩺',
+        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400'
     },
     {
-        name: "Sexual Disorders of Men",
-        image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=600&q=80",
+        title: 'Medicine Home Delivery',
+        desc: 'Ghar baithe homoeopathic dawai mangwaiye — fast aur reliable delivery aapke darwaze tak.',
+        icon: '🚚',
+        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'
     },
     {
-        name: "Diabetes & Hypertension",
-        image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80",
+        title: 'Diet Management',
+        desc: 'Disease oriented diet chart, goal oriented diet plan aur personalized nutrition guidance.',
+        icon: '🥗',
+        image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400'
     },
     {
-        name: "Anxiety & Depression",
-        image: "https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?w=600&q=80",
+        title: 'Cosmetic Products',
+        desc: 'Natural homoeopathic cosmetic products — skin care, hair care aur beauty solutions.',
+        icon: '✨',
+        image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400'
     },
     {
-        name: "Hair Fall Treatment",
-        image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
-    },
-    {
-        name: "Renal Stones",
-        image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80",
+        title: 'Diet Chart Service',
+        desc: 'Vyaktigat diet chart — aapki bimari, age aur lifestyle ke anusaar personalized meal plan.',
+        icon: '📋',
+        image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400'
     },
 ];
 

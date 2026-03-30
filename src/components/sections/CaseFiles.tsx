@@ -199,10 +199,10 @@ export function CaseFiles() {
 
                 {/* View All Button */}
                 {cases.length > 0 && (
-                    <div className="mt-16 text-center">
+                    <div className="mt-12 pt-4 text-center">
                         <Link 
                             href="/case-files"
-                            className={`inline-flex items-center gap-3 px-8 py-3.5 bg-forest text-white rounded-full font-bold text-sm hover:bg-[#1a3a2a] transition-all shadow-lg active:scale-95 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+                            className={`view-all-btn shadow-lg active:scale-95 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                             style={{ transitionDelay: "600ms" }}
                         >
                             View All Success Gallery

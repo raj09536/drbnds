@@ -20,41 +20,25 @@ export function Services() {
     }
 
     return (
-        <section id="services" ref={ref} style={{ background: "var(--cream)", padding: "96px 0" }}>
+        <section id="services" ref={ref} className="py-24 bg-[#f5f0e8]">
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
                     <div>
                         <span
-                            className={`block transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-                            style={{
-                                fontFamily: "var(--font-dm-sans)",
-                                fontSize: "11px",
-                                letterSpacing: "5px",
-                                textTransform: "uppercase",
-                                color: "var(--mint)",
-                                fontWeight: 500,
-                            }}
+                            className={`block eyebrow transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                         >
-                            How We Help
+                            WHAT WE OFFER
                         </span>
                         <h2
-                            className={`mt-4 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-                            style={{
-                                fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-                                fontSize: "clamp(28px, 3.5vw, 40px)",
-                                fontWeight: 600,
-                                color: "var(--forest)",
-                                lineHeight: 1.2,
-                                transitionDelay: "100ms",
-                            }}
+                            className={`mt-4 section-title transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                            style={{ transitionDelay: "100ms" }}
                         >
-                            Healthcare Services
+                            Our Services
                         </h2>
                         <p
                             className={`mt-3 transition-all duration-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                             style={{
-                                fontFamily: "var(--font-dm-sans)",
                                 fontSize: "15px",
                                 color: "var(--muted)",
                                 lineHeight: 1.75,
@@ -70,16 +54,14 @@ export function Services() {
                     <div className="flex gap-3 mt-6 sm:mt-0">
                         <button
                             onClick={() => scroll("left")}
-                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer"
-                            style={{ width: "44px", height: "44px" }}
+                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer w-11 h-11"
                             aria-label="Previous"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => scroll("right")}
-                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer"
-                            style={{ width: "44px", height: "44px" }}
+                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer w-11 h-11"
                             aria-label="Next"
                         >
                             <ChevronRight className="w-5 h-5" />
@@ -95,7 +77,7 @@ export function Services() {
                 >
                     {services.map((service, i) => (
                         <div
-                            key={service.name}
+                            key={service.title}
                             className={`shrink-0 snap-start group cursor-pointer overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
                             style={{
                                 width: "280px",
@@ -114,39 +96,32 @@ export function Services() {
                             <div
                                 className="absolute inset-0 transition-all duration-300"
                                 style={{
-                                    background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)",
+                                    background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
                                 }}
                             />
                             {/* Label */}
                             <div className="absolute bottom-0 left-0 right-0 p-6">
+                                <div className="text-2xl mb-1 transform transition-transform duration-300 group-hover:scale-110 origin-left">
+                                    {service.icon}
+                                </div>
                                 <h3
-                                    style={{
-                                        fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-                                        fontSize: "22px",
-                                        fontWeight: 600,
-                                        color: "white",
-                                    }}
+                                    className="text-white font-serif text-xl font-bold leading-tight"
                                 >
-                                    {service.name}
+                                    {service.title}
                                 </h3>
+                                <p className="text-white/70 text-[11px] mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-2">
+                                    {service.desc}
+                                </p>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* View All */}
-                <div className="text-center mt-10">
+                {/* View All Button */}
+                <div className="text-center mt-12 pt-4">
                     <Link
                         href="#specializations"
-                        className="inline-flex items-center gap-2 rounded-lg transition-all duration-200 hover:bg-forest hover:text-white"
-                        style={{
-                            border: "2px solid var(--forest)",
-                            color: "var(--forest)",
-                            padding: "12px 28px",
-                            fontFamily: "var(--font-dm-sans)",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                        }}
+                        className="view-all-services-btn"
                     >
                         View All →
                     </Link>
@@ -154,10 +129,28 @@ export function Services() {
             </div>
 
             <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .view-all-services-btn {
+                    border: 1.5px solid #2D5016;
+                    color: #2D5016;
+                    background: transparent;
+                    padding: 12px 28px;
+                    border-radius: 100px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+                    text-decoration: none;
+                    display: inline-block;
+                }
+
+                .view-all-services-btn:hover {
+                    background: #2D5016;
+                    color: #FFFFFF !important;
+                }
+            `}</style>
         </section>
     )
 }
