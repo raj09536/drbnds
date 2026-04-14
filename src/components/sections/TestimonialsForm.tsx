@@ -109,25 +109,25 @@ export function TestimonialsForm() {
 
             const mediaUrl = urlData?.publicUrl || null
 
-            const insertData = {
-                patient_name: name.trim(),
-                review: review.trim(),
-                rating,
-                doctor_id: selectedDoctorId,
-                type: reviewType,
-                media_url: mediaUrl,
-                is_active: false,
-            }
-
-            console.log("Inserting testimonial data:", insertData)
-
-            const { error: insertError } = await supabase.from("testimonials").insert(insertData)
+            const res = await fetch("/api/testimonials", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    patient_name: name.trim(),
+                    review: review.trim(),
+                    rating,
+                    doctor_id: selectedDoctorId,
+                    type: reviewType,
+                    media_url: mediaUrl,
+                }),
+            })
 
             setLoading(false)
 
-            if (insertError) {
-                console.error("Testimonial error:", JSON.stringify(insertError, null, 2))
-                toast.error("Failed to submit testimonial. Please try again.")
+            if (!res.ok) {
+                const body = await res.json()
+                console.error("Testimonial API error:", body)
+                toast.error(body?.error || "Failed to submit testimonial.")
             } else {
                 setSubmitted(true)
                 setName("")
@@ -434,7 +434,7 @@ export function TestimonialsForm() {
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
-                                                accept={reviewType === 'video' ? "video/mp4,video/webm" : "audio/mpeg,audio/wav,audio/webm"}
+                                                accept={reviewType === 'video' ? "video/*" : "audio/*"}
                                                 className="sr-only"
                                                 onChange={(e) => setMediaFile(e.target.files?.[0] || null)}
                                             />

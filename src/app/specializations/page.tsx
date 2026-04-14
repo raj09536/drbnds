@@ -27,7 +27,7 @@ export default function SpecializationsPage() {
                         Our Specializations
                     </h1>
                     <p className="text-muted-foreground text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
-                        15+ saal ke anubhav ke saath, hum sabhi prakar ki bimariyon ka homoeopathic ilaj karte hain
+                        With over 15 years of dedicated practice, we provide expert homoeopathic treatment for a wide range of conditions.
                     </p>
                 </div>
             </section>
@@ -72,10 +72,10 @@ export default function SpecializationsPage() {
                 
                 <div className="container mx-auto px-6 text-center max-w-3xl relative z-10">
                     <h2 className="text-3xl md:text-5xl font-bold font-serif mb-8 leading-tight">
-                        Apni Takleef Ke Baare Mein Baat Karein
+                        Speak With Our Specialists Today
                     </h2>
                     <p className="text-white/80 text-lg mb-12 max-w-xl mx-auto">
-                        Humara vishesh upchar aapki sehat ko behtar banane mein madad kar sakta hai. Aaj hi appointment book karein.
+                        Our personalised treatment approach can help restore your health naturally. Book your appointment today.
                     </p>
                     <button
                         onClick={() => openModal()}

@@ -102,54 +102,54 @@ export const stats = [
 ];
 
 export const specializations = [
-    { icon: '🤧', title: 'Allergies', desc: 'Skin allergies, food allergies, dust allergies aur sabhi prakar ki allergic conditions ka homoeopathic ilaj.' },
-    { icon: '👶', title: 'Children Problems', subtitle: '(Paediatric)', desc: 'Bacchon ki sabhi bimariyon ka safe aur effective homoeopathic treatment — bina side effects ke.' },
-    { icon: '👴', title: 'Old Age Problems', subtitle: '(Geriatrics)', desc: 'Buzurgon ki takleefon jaise joint pain, weakness, memory issues ka gentle homoeopathic ilaj.' },
-    { icon: '👩', title: 'Female Problems', subtitle: '(Gynaecology)', desc: 'Mahilaon ki sabhi samasyon — PCOD, irregular periods, leucorrhoea ka visheshagya upchar.' },
-    { icon: '✨', title: 'Beauty Problems', desc: 'Acne, hair fall, pigmentation, skin problems ka andar se ilaj — natural aur long lasting results.' },
-    { icon: '🧠', title: 'Mind / Mental Problems', desc: 'Anxiety, depression, stress, insomnia aur sabhi mansik samasyon ka homoeopathic samadhan.' },
-    { icon: '⚡', title: 'Hormonal / Endocrinal Problems', desc: 'Thyroid, diabetes, hormonal imbalance ka root cause se homoeopathic upchar.' },
-    { icon: '🦴', title: 'Bones & Joint Problems', desc: 'Arthritis, back pain, cervical, knee pain — sabhi haddi aur jodo ki takleefon ka ilaj.' },
-    { icon: '🧬', title: 'Neurological Problems', desc: 'Migraine, nerve pain, numbness aur sabhi neurological conditions ka homoeopathic treatment.' },
-    { icon: '🫘', title: 'Kidney Problems', desc: 'Kidney stones, UTI, kidney function issues ka safe homoeopathic management.' },
-    { icon: '🫃', title: 'Gastro / Gastric Problems', desc: 'Acidity, IBS, constipation, gas, digestive disorders ka permanent homoeopathic ilaj.' },
-    { icon: '👂', title: 'Ear / Nose / Throat', desc: 'Sinusitis, tonsils, ear infections, nasal problems ka homoeopathic upchar.' },
-    { icon: '🫁', title: 'Respiratory Problems', desc: 'Asthma, bronchitis, chronic cough, breathing issues ka root se homoeopathic ilaj.' },
-    { icon: '🌿', title: 'Lifestyle Problems', desc: 'Obesity, fatigue, immunity issues, lifestyle disorders ka holistic homoeopathic samadhan.' },
+    { icon: '🤧', title: 'Allergies', desc: 'Homoeopathic treatment for skin allergies, food allergies, dust allergies and all types of allergic conditions.' },
+    { icon: '👶', title: 'Children Problems', subtitle: '(Paediatric)', desc: 'Safe and effective homoeopathic treatment for all childhood illnesses — entirely free from side effects.' },
+    { icon: '👴', title: 'Old Age Problems', subtitle: '(Geriatrics)', desc: 'Gentle homoeopathic care for elderly patients, addressing joint pain, weakness, memory issues and age-related conditions.' },
+    { icon: '👩', title: 'Female Problems', subtitle: '(Gynaecology)', desc: 'Specialist homoeopathic treatment for all women\'s health concerns, including PCOD, irregular periods and leucorrhoea.' },
+    { icon: '✨', title: 'Beauty Problems', desc: 'Natural homoeopathic treatment for acne, hair loss, pigmentation and skin conditions — addressing the root cause for lasting results.' },
+    { icon: '🧠', title: 'Mind / Mental Problems', desc: 'Effective homoeopathic treatment for anxiety, depression, stress, insomnia and all mental health conditions.' },
+    { icon: '⚡', title: 'Hormonal / Endocrinal Problems', desc: 'Root-cause homoeopathic treatment for thyroid disorders, diabetes and hormonal imbalances.' },
+    { icon: '🦴', title: 'Bones & Joint Problems', desc: 'Relief from arthritis, back pain, cervical spondylosis and all bone and joint conditions.' },
+    { icon: '🧬', title: 'Neurological Problems', desc: 'Homoeopathic management of migraines, nerve pain, numbness and neurological disorders.' },
+    { icon: '🫘', title: 'Kidney Problems', desc: 'Safe and gentle homoeopathic treatment for kidney stones, UTIs and kidney function disorders.' },
+    { icon: '🫃', title: 'Gastro / Gastric Problems', desc: 'Lasting homoeopathic relief from acidity, IBS, constipation, bloating and digestive disorders.' },
+    { icon: '👂', title: 'Ear / Nose / Throat', desc: 'Homoeopathic treatment for sinusitis, tonsillitis, ear infections and nasal conditions.' },
+    { icon: '🫁', title: 'Respiratory Problems', desc: 'Root-cause homoeopathic treatment for asthma, bronchitis, chronic cough and breathing disorders.' },
+    { icon: '🌿', title: 'Lifestyle Problems', desc: 'Holistic homoeopathic care for obesity, fatigue, low immunity and lifestyle-related conditions.' },
 ];
 
 export const services = [
     {
         title: 'All Type Consultation',
-        desc: 'In-clinic, online aur phone consultation available — apni suvidha ke anusaar doctor se milein.',
+        desc: 'In-clinic, online and telephone consultations available — consult our doctors at your convenience.',
         icon: '🩺',
         image: '/doctor.jpeg',
         slug: 'all-type-consultation'
     },
     {
         title: 'Medicine Home Delivery',
-        desc: 'Ghar baithe homoeopathic dawai mangwaiye — fast aur reliable delivery aapke darwaze tak.',
+        desc: 'Order your homoeopathic medicines from the comfort of your home — fast and reliable doorstep delivery.',
         icon: '🚚',
         image: '/homeopathic-medicine.jpg',
         slug: 'medicine-home-delivery'
     },
     {
         title: 'Diet Management',
-        desc: 'Disease oriented diet chart, goal oriented diet plan aur personalized nutrition guidance.',
+        desc: 'Disease-specific diet charts, goal-oriented meal plans and personalised nutritional guidance.',
         icon: '🥗',
         image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400',
         slug: 'diet-management'
     },
     {
         title: 'Cosmetic Products',
-        desc: 'Natural homoeopathic cosmetic products — skin care, hair care aur beauty solutions.',
+        desc: 'Natural homoeopathic cosmetic products for skin care, hair care and holistic beauty.',
         icon: '✨',
         image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
         slug: 'cosmetic-products'
     },
     {
         title: 'Diet Chart Service',
-        desc: 'Vyaktigat diet chart — aapki bimari, age aur lifestyle ke anusaar personalized meal plan.',
+        desc: 'Personalised diet charts tailored to your condition, age and lifestyle requirements.',
         icon: '📋',
         image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400',
         slug: 'diet-chart-service'

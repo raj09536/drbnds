@@ -111,6 +111,12 @@ export function Navbar() {
 
                 {/* Desktop CTA */}
                 <div className="hidden md:flex items-center gap-3">
+                    <Link
+                        href="/login"
+                        className="text-forest/60 text-xs font-semibold flex items-center gap-1 uppercase tracking-widest hover:text-forest transition-colors"
+                    >
+                        Staff Login <ArrowRight className="w-3 h-3" />
+                    </Link>
                     <button
                         onClick={() => openModal()}
                         className="flex items-center gap-2 bg-forest text-white rounded-lg hover:bg-sage transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"

@@ -67,7 +67,7 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
                             fontWeight: 700,
                         }}
                     >
-                        {member.isPharmacist ? "Team Member" : "Specialist Doctor"}
+                        {member.isPharmacist ? "D. Pharma Homeopathy" : "Specialist Doctor"}
                     </span>
                     <div className="hidden sm:flex items-center gap-1 text-gold">
                         {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="var(--gold)" />)}
@@ -180,12 +180,12 @@ export function Doctors() {
             const pharmacist = {
                 id: 'pharmacist',
                 name: 'Amit Kumar',
-                role: 'Pharmacist',
-                specialization: 'Medicine & Drug Dispensing',
-                photo: '/amit-kumar.jpg', 
+                role: 'D. Pharma Homeopathy',
+                specialization: 'D. Pharma Homeopathy',
+                photo: '/amit-kumar.jpg',
                 initials: 'AK',
-                qualifications: ['B.Pharm', 'Registered Pharmacist'],
-                years_exp: 10,
+                qualifications: ['D. Pharma', 'Homoeopathy Pharmacist'],
+                years_exp: 2,
                 clinic_name: "Dr. BND's Clinic",
                 bio: "Expert pharmacist specializing in holistic medicine dispensing and personalized patient medication guidance. Committed to pharmaceutical excellence.",
                 phone: "+91 81919 19949",

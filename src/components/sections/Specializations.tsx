@@ -33,7 +33,7 @@ export function Specializations() {
                             transitionDelay: "200ms" 
                         }}
                     >
-                        15+ saal ke anubhav ke saath, hum sabhi prakar ki bimariyon ka homoeopathic ilaj karte hain
+                        With over 15 years of dedicated practice, we provide expert homoeopathic treatment for a wide range of conditions.
                     </p>
                 </div>
 

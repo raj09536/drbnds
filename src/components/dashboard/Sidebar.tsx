@@ -106,17 +106,36 @@ export function Sidebar({ unavailability = [], onOpenSchedule }: SidebarProps) {
             .eq('clinic_id', doctor.clinic_id)
             .eq('is_read', false)
 
-        // Pending Feedback (Logic remains table-based)
-        const { count: feedbackCount } = await supabase
+        // Get all doctor IDs for this clinic
+        const { data: clinicDoctors } = await supabase
+            .from('doctors')
+            .select('id')
+            .eq('clinic_id', doctor.clinic_id)
+        const doctorIds = (clinicDoctors || []).map((d: any) => d.id)
+        const doctorIdFilter = doctorIds.length > 0 ? doctorIds : [-1]
+
+        // Pending text feedback
+        const { data: feedbackRaw } = await supabase
             .from('feedback')
-            .select('*', { count: 'exact', head: true })
+            .select('id, is_rejected')
             .eq('clinic_id', doctor.clinic_id)
             .eq('is_approved', false)
+
+        // Pending video/audio — by doctor_id
+        const { data: mediaRaw } = await supabase
+            .from('testimonials')
+            .select('id, is_rejected')
+            .in('doctor_id', doctorIdFilter)
+            .eq('is_active', false)
+            .in('type', ['video', 'audio'])
+
+        const pendingText = (feedbackRaw || []).filter((f: any) => !f.is_rejected).length
+        const pendingMedia = (mediaRaw || []).filter((t: any) => !t.is_rejected).length
 
         setCounts({
             unreadMsgs: msgCount || 0,
             pendingAppts: apptCount || 0,
-            pendingTestimonials: feedbackCount || 0
+            pendingTestimonials: pendingText + pendingMedia
         })
     }, [doctor])
 
