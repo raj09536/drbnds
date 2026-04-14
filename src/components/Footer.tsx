@@ -133,8 +133,8 @@ export function Footer() {
     return (
         <footer style={{ background: "var(--charcoal)", color: "white" }}>
             {/* Top Section */}
-            <div className="container mx-auto px-6" style={{ padding: "64px 24px" }}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div className="container mx-auto px-6 pt-14 md:pt-20 pb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
                     {/* Col 1: Brand */}
                     <div>
                         <button
@@ -316,15 +316,9 @@ export function Footer() {
                 </div>
             </div>
 
-            {/* Divider */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }} />
-
             {/* Bottom Bar */}
             <div className="container mx-auto px-6">
-                <div
-                    className="flex flex-col md:flex-row justify-between items-center gap-4"
-                    style={{ padding: "20px 0" }}
-                >
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 pb-6 border-t border-white/10 mt-2">
                     <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
                         © {currentYear} Dr. BND&apos;s Clinic. All rights reserved.
                     </p>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Phone, Video, Building2, ArrowRight, Calendar, MapPin, Pill } from "lucide-react"
+import { Phone, Video, Building2, ArrowRight, Calendar, MapPin, Pill, Star } from "lucide-react"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { useAppointment } from "@/context/AppointmentContext"
 import { doctors as staticDoctors } from "@/data/staticData"
@@ -10,13 +10,12 @@ import { supabase } from "@/lib/supabase"
 /* ─── Sub-Component for Team Member Card ─── */
 function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) {
     const isAmit = member.id === 'pharmacist' && !member.photo
+    const initials = member.name.split(" ").map((n:any) => n[0]).join("").slice(0, 2)
 
     return (
         <div
-            className={`transition-all duration-700 flex flex-col lg:flex-row ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            className={`transition-all duration-700 flex flex-col items-center md:gap-12 ${isReversed ? "md:flex-row-reverse" : "md:flex-row"} ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             style={{
-                display: "flex",
-                flexDirection: isReversed ? "row-reverse" : "row",
                 background: "white",
                 border: "1px solid rgba(0,0,0,0.06)",
                 borderRadius: "24px",
@@ -24,48 +23,27 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
                 boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
                 marginBottom: "32px",
                 transitionDelay: `${idx * 150}ms`,
-                minHeight: "400px",
                 maxWidth: "1000px",
                 margin: "0 auto 32px auto"
             }}
         >
-            {/* Image Side - Fixed Size */}
+            {/* Image Side - Responsive Size */}
             {isAmit ? (
-                <div style={{
-                    width: '320px',
-                    minWidth: '320px',
-                    height: '400px',
-                    background: '#1a3a2a',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 56,
-                    color: 'white',
-                    fontWeight: 700,
-                    flexShrink: 0
-                }}>
-                    AK
+                <div className="shrink-0 flex items-center justify-center font-bold text-6xl text-white bg-[#1a3a2a] w-full max-w-[320px] mx-auto aspect-square md:w-[280px] md:max-w-none md:h-[400px] md:aspect-auto mt-4 md:mt-0 md:ml-4 md:mr-4">
+                    {initials}
                 </div>
             ) : (
-                <div style={{
-                    width: '320px',
-                    minWidth: '320px',
-                    height: '400px',
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    background: '#f5f0e8',
-                    position: 'relative'
-                }}>
+                <div className="shrink-0 overflow-hidden relative bg-[#f5f0e8] w-full max-w-[320px] mx-auto aspect-square md:w-[280px] md:max-w-none md:h-[400px] md:aspect-auto mt-6 md:mt-0 md:ml-4 md:mr-4">
                     <img
                         src={member.photo}
                         alt={member.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+                        className="w-full h-full object-cover object-top"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             if (e.currentTarget.parentElement) {
                                 e.currentTarget.parentElement.innerHTML = 
-                                    `<div style="width:320px;height:400px;background:#1a3a2a;display:flex;align-items:center;justify-content:center;font-size:56px;color:white;font-weight:700">
-                                        ${member.id === 'pharmacist' ? 'AK' : member.name.split(" ").map((n:any) => n[0]).join("").slice(0, 2)}
+                                    `<div class="w-full h-full flex items-center justify-center font-bold text-6xl text-white bg-[#1a3a2a]">
+                                        ${initials}
                                     </div>`
                             }
                         }}
@@ -74,32 +52,33 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
             )}
 
             {/* Content Side - Flexible */}
-            <div style={{
-                flex: 1,
-                padding: '40px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                background: isReversed ? "#fcfbf9" : "white"
-            }}>
-                <span
-                    style={{
-                        fontFamily: "var(--font-dm-sans)",
-                        fontSize: "11px",
-                        letterSpacing: "4px",
-                        textTransform: "uppercase",
-                        color: "var(--mint)",
-                        fontWeight: 700,
-                    }}
-                >
-                    {member.isPharmacist ? "Team Member" : "Specialist Doctor"}
-                </span>
+            <div 
+                className="flex-1 p-8 lg:p-10 flex flex-col justify-center" 
+                style={{ background: isReversed ? "#fcfbf9" : "white" }}
+            >
+                <div className="flex items-center justify-between mb-3">
+                    <span
+                        style={{
+                            fontFamily: "var(--font-dm-sans)",
+                            fontSize: "11px",
+                            letterSpacing: "4px",
+                            textTransform: "uppercase",
+                            color: "var(--mint)",
+                            fontWeight: 700,
+                        }}
+                    >
+                        {member.isPharmacist ? "Team Member" : "Specialist Doctor"}
+                    </span>
+                    <div className="hidden sm:flex items-center gap-1 text-gold">
+                        {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="var(--gold)" />)}
+                    </div>
+                </div>
 
                 <h3
-                    className="mt-3"
+                    className="mt-1"
                     style={{
                         fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-                        fontSize: "38px",
+                        fontSize: "clamp(22px, 3vw, 32px)",
                         fontWeight: 600,
                         color: "var(--forest)",
                         lineHeight: 1.1,
@@ -149,16 +128,16 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
                     <div className="mt-8 flex flex-wrap items-center gap-4">
                         <button
                             onClick={() => openModal(member.id)}
-                            className="px-8 py-3 bg-forest text-white rounded-full font-bold text-[14px] shadow-sm hover:brightness-110 transition-all cursor-pointer"
+                            className="px-8 py-3 bg-forest text-white rounded-full font-bold text-[14px] shadow-sm hover:brightness-110 transition-all cursor-pointer flex items-center gap-2"
                         >
                             Book Consultation
-                            <ArrowRight size={16} className="inline ml-2" />
+                            <ArrowRight size={16} className="inline ml-1" />
                         </button>
                         <div className="flex gap-2">
-                             <a href={`tel:${member.phone}`} className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-forest hover:bg-forest hover:text-white transition-all">
+                             <a href={`tel:${member.phone}`} className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-gray-100 flex items-center justify-center text-forest hover:bg-forest hover:text-white transition-all">
                                 <Phone size={16} />
                             </a>
-                            <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-forest hover:bg-forest hover:text-white transition-all cursor-pointer">
+                            <button className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-gray-100 flex items-center justify-center text-forest hover:bg-forest hover:text-white transition-all cursor-pointer">
                                 <Video size={16} />
                             </button>
                         </div>
@@ -193,9 +172,9 @@ export function Doctors() {
                 qualifications: d.qualifications || ["Expert Doctor"],
                 specialization: d.specialization || "General Physician",
                 years_exp: d.years_exp || 5,
-                clinic_name: d.clinic_name || "Dr. BND's Clinic",
-                bio: d.bio || "Dedicated medical professional.",
-                phone: d.phone || "+91 00000 00000"
+                clinic_name: d.clinic_name || "Dr. BND's clinic",
+                bio: d.bio || "Dedicated medical professional providing holistic care through advanced homoeopathy.",
+                phone: d.phone || "+91 81919 19949"
             })) : staticDoctors
 
             const pharmacist = {
@@ -207,9 +186,9 @@ export function Doctors() {
                 initials: 'AK',
                 qualifications: ['B.Pharm', 'Registered Pharmacist'],
                 years_exp: 10,
-                clinic_name: "Dr. BND's clinic",
+                clinic_name: "Dr. BND's Clinic",
                 bio: "Expert pharmacist specializing in holistic medicine dispensing and personalized patient medication guidance. Committed to pharmaceutical excellence.",
-                phone: "+91 00000 00000",
+                phone: "+91 81919 19949",
                 isPharmacist: true
             }
 
@@ -219,9 +198,9 @@ export function Doctors() {
     }, [])
 
     return (
-        <section id="doctors" ref={ref} style={{ background: "white", padding: "100px 0" }}>
-            <div className="container mx-auto px-6">
-                <div className="text-center max-w-2xl mx-auto mb-16">
+        <section id="doctors" ref={ref} className="section-padding bg-white overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
                     <span
                         className={`block transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                         style={{
@@ -233,24 +212,24 @@ export function Doctors() {
                             fontWeight: 700,
                         }}
                     >
-                        Meet the Team
+                        Medical Board
                     </span>
                     <h2
                         className={`mt-4 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                         style={{
                             fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-                            fontSize: "clamp(32px, 4.5vw, 42px)",
+                            fontSize: "clamp(32px, 4.5vw, 48px)",
                             fontWeight: 600,
                             color: "var(--forest)",
                             lineHeight: 1.1,
                             transitionDelay: "100ms",
                         }}
                     >
-                        Our Team
+                        Our Clinical Experts
                     </h2>
                 </div>
 
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col">
                     {teamMembers.map((member, idx) => (
                         <TeamMemberCard 
                             key={member.id} 
@@ -266,3 +245,4 @@ export function Doctors() {
         </section>
     )
 }
+

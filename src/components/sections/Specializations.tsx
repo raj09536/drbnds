@@ -10,7 +10,7 @@ export function Specializations() {
     const previewSpecs = specializations.slice(0, 6)
 
     return (
-        <section id="specializations" ref={ref} className="py-24 bg-[#FAFAF7]">
+        <section id="specializations" ref={ref} className="py-14 md:py-24 bg-[#FAFAF7]">
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="text-center max-w-2xl mx-auto mb-16">
@@ -38,16 +38,16 @@ export function Specializations() {
                 </div>
 
                 {/* Grid - 3x2 on desktop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
                     {previewSpecs.map((spec, i) => (
                         <div
                             key={spec.title}
-                            className={`group bg-white p-8 rounded-2xl border border-[#2D501615] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(45,80,22,0.1)] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+                            className={`group bg-white p-5 md:p-8 rounded-2xl border border-[#2D501615] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(45,80,22,0.1)] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
                             style={{
                                 transitionDelay: `${300 + i * 50}ms`,
                             }}
                         >
-                            <div className="text-[48px] mb-6 transform transition-transform duration-300 group-hover:scale-110">
+                            <div className="text-[36px] md:text-[48px] mb-6 transform transition-transform duration-300 group-hover:scale-110">
                                 {spec.icon}
                             </div>
                             

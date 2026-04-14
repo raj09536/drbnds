@@ -7,10 +7,16 @@ import { stats } from "@/data/staticData"
 function StatItem({ number, suffix, label, isVisible }: { number: number; suffix: string; label: string; isVisible: boolean }) {
     const count = useCountUp(number, 2000, isVisible)
 
+    const formatNumber = (n: number) => {
+        if (n >= 100000) return (n / 100000).toFixed(0) + "L"
+        if (n >= 1000) return (n / 1000).toFixed(0) + "K"
+        return n.toString()
+    }
+
     return (
         <div className="text-center">
-            <div style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "56px", fontWeight: 700, color: "var(--gold)", lineHeight: 1 }}>
-                {count.toLocaleString()}{suffix}
+            <div style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 700, color: "var(--gold)", lineHeight: 1 }}>
+                {formatNumber(count)}{suffix}
             </div>
             <div
                 className="mt-2"
@@ -38,11 +44,11 @@ export function StatsBar() {
                 background: "var(--forest)",
                 borderTop: "1px solid rgba(255,255,255,0.1)",
                 borderBottom: "1px solid rgba(255,255,255,0.1)",
-                padding: "48px 0",
+                padding: "clamp(32px, 5vw, 48px) 0",
             }}
         >
             <div className="container mx-auto px-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {stats.map((stat, i) => (
                         <div key={stat.label} className="relative flex justify-center">
                             <StatItem

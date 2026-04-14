@@ -97,7 +97,7 @@ export const clinics = [
 export const stats = [
     { number: 15, suffix: "+", label: "Years Experience" },
     { number: 2, suffix: "", label: "Clinic Locations" },
-    { number: 5000, suffix: "+", label: "Patients Treated" },
+    { number: 100000, suffix: "+", label: "Patients Treated" },
     { number: 2, suffix: "", label: "Expert Doctors" },
 ];
 
@@ -123,33 +123,39 @@ export const services = [
         title: 'All Type Consultation',
         desc: 'In-clinic, online aur phone consultation available — apni suvidha ke anusaar doctor se milein.',
         icon: '🩺',
-        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400'
+        image: '/doctor.jpeg',
+        slug: 'all-type-consultation'
     },
     {
         title: 'Medicine Home Delivery',
         desc: 'Ghar baithe homoeopathic dawai mangwaiye — fast aur reliable delivery aapke darwaze tak.',
         icon: '🚚',
-        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'
+        image: '/homeopathic-medicine.jpg',
+        slug: 'medicine-home-delivery'
     },
     {
         title: 'Diet Management',
         desc: 'Disease oriented diet chart, goal oriented diet plan aur personalized nutrition guidance.',
         icon: '🥗',
-        image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400'
+        image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400',
+        slug: 'diet-management'
     },
     {
         title: 'Cosmetic Products',
         desc: 'Natural homoeopathic cosmetic products — skin care, hair care aur beauty solutions.',
         icon: '✨',
-        image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400'
+        image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+        slug: 'cosmetic-products'
     },
     {
         title: 'Diet Chart Service',
         desc: 'Vyaktigat diet chart — aapki bimari, age aur lifestyle ke anusaar personalized meal plan.',
         icon: '📋',
-        image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400'
+        image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400',
+        slug: 'diet-chart-service'
     },
 ];
+
 
 export const galleryImages = [
     {

@@ -11,13 +11,14 @@ export function AboutUs() {
         <section
             id="about"
             ref={ref}
-            style={{ background: "var(--cream)", padding: "96px 0" }}
+            className="section-padding"
+            style={{ background: "var(--cream)" }}
         >
             <div className="container mx-auto px-6">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     {/* Left: Image */}
                     <div
-                        className={`relative transition-all duration-700 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
+                        className={`relative transition-all duration-700 max-h-[420px] lg:max-h-none overflow-hidden lg:overflow-visible ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
                     >
                         <div className="relative rounded-2xl overflow-hidden shadow-lg" style={{ aspectRatio: "4/5" }}>
                             <Image
@@ -81,7 +82,7 @@ export function AboutUs() {
                             className="mt-5"
                             style={{
                                 fontFamily: "var(--font-dm-sans)",
-                                fontSize: "15px",
+                                fontSize: "clamp(13px, 1.8vw, 16px)",
                                 color: "var(--muted)",
                                 lineHeight: 1.75,
                             }}
@@ -102,7 +103,7 @@ export function AboutUs() {
                             <p
                                 style={{
                                     fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)",
-                                    fontSize: "18px",
+                                    fontSize: "clamp(13px, 1.8vw, 16px)",
                                     fontStyle: "italic",
                                     color: "var(--forest)",
                                     lineHeight: 1.7,

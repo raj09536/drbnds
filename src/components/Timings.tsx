@@ -11,7 +11,7 @@ export function WorkingHours() {
     const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" })
 
     return (
-        <section ref={ref} style={{ background: "var(--forest)", padding: "96px 0" }}>
+        <section ref={ref} className="section-padding" style={{ background: "var(--forest)" }}>
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -91,7 +91,7 @@ export function WorkingHours() {
                                 <span
                                     style={{
                                         fontFamily: "var(--font-dm-sans)",
-                                        fontSize: "14px",
+                                        fontSize: "clamp(12px, 2vw, 14px)",
                                         color: isToday ? "var(--gold)" : "rgba(255,255,255,0.7)",
                                         fontWeight: isToday ? 600 : 400,
                                     }}
@@ -115,7 +115,7 @@ export function WorkingHours() {
                                 <span
                                     style={{
                                         fontFamily: "var(--font-dm-sans)",
-                                        fontSize: "14px",
+                                        fontSize: "clamp(12px, 2vw, 14px)",
                                         fontWeight: 500,
                                         color: row.closed ? "var(--rose)" : "white",
                                     }}

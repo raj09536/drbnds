@@ -1,26 +1,72 @@
 "use client"
 
-import { useRef } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { services } from "@/data/staticData"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export function Services() {
     const { ref, isVisible } = useScrollReveal(0.1)
-    const scrollRef = useRef<HTMLDivElement>(null)
+    const router = useRouter()
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [visibleCount, setVisibleCount] = useState(5)
+    const [touchStart, setTouchStart] = useState<number | null>(null)
+    const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
-    const scroll = (dir: "left" | "right") => {
-        if (!scrollRef.current) return
-        const amount = 300
-        scrollRef.current.scrollBy({
-            left: dir === "left" ? -amount : amount,
-            behavior: "smooth",
-        })
+    // Handle visible count based on screen size
+    useEffect(() => {
+        const updateVisibleCount = () => {
+            if (window.innerWidth < 640) {
+                setVisibleCount(1)
+            } else if (window.innerWidth < 1024) {
+                setVisibleCount(2)
+            } else {
+                setVisibleCount(5)
+            }
+        }
+        updateVisibleCount()
+        window.addEventListener("resize", updateVisibleCount)
+        return () => window.removeEventListener("resize", updateVisibleCount)
+    }, [])
+
+    const handlePrev = () => {
+        setCurrentIndex((prev) => Math.max(0, prev - 1))
     }
 
+    const handleNext = () => {
+        setCurrentIndex((prev) => Math.min(services.length - visibleCount, prev + 1))
+    }
+
+    // Touch handlers for swipe
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null)
+        setTouchStart(e.targetTouches[0].clientX)
+    }
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX)
+    }
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return
+        const distance = touchStart - touchEnd
+        const isLeftSwipe = distance > 50
+        const isRightSwipe = distance < -50
+        if (isLeftSwipe) handleNext()
+        if (isRightSwipe) handlePrev()
+    }
+
+    // Adjust current index if it exceeds the max allowed after resize
+    useEffect(() => {
+        const maxIndex = Math.max(0, services.length - visibleCount)
+        if (currentIndex > maxIndex) {
+            setCurrentIndex(maxIndex)
+        }
+    }, [visibleCount, currentIndex])
+
     return (
-        <section id="services" ref={ref} className="py-24 bg-[#f5f0e8]">
+        <section id="services" ref={ref} className="py-14 md:py-24 bg-[#f5f0e8] overflow-hidden">
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
@@ -53,15 +99,17 @@ export function Services() {
                     {/* Arrow Buttons */}
                     <div className="flex gap-3 mt-6 sm:mt-0">
                         <button
-                            onClick={() => scroll("left")}
-                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer w-11 h-11"
+                            onClick={handlePrev}
+                            disabled={currentIndex === 0}
+                            className={`flex items-center justify-center bg-white shadow-md rounded-full transition-all duration-200 w-11 h-11 ${currentIndex === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-forest hover:text-white cursor-pointer"}`}
                             aria-label="Previous"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
-                            onClick={() => scroll("right")}
-                            className="flex items-center justify-center bg-white shadow-md rounded-full hover:bg-forest hover:text-white transition-all duration-200 cursor-pointer w-11 h-11"
+                            onClick={handleNext}
+                            disabled={currentIndex >= services.length - visibleCount}
+                            className={`flex items-center justify-center bg-white shadow-md rounded-full transition-all duration-200 w-11 h-11 ${currentIndex >= services.length - visibleCount ? "opacity-50 cursor-not-allowed" : "hover:bg-forest hover:text-white cursor-pointer"}`}
                             aria-label="Next"
                         >
                             <ChevronRight className="w-5 h-5" />
@@ -69,88 +117,64 @@ export function Services() {
                     </div>
                 </div>
 
-                {/* Carousel */}
-                <div
-                    ref={scrollRef}
-                    className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                {/* Slider Wrapper */}
+                <div 
+                    className="relative"
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
                 >
-                    {services.map((service, i) => (
-                        <div
-                            key={service.title}
-                            className={`shrink-0 snap-start group cursor-pointer overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
-                            style={{
-                                width: "280px",
-                                height: "340px",
-                                borderRadius: "16px",
-                                position: "relative",
-                                transitionDelay: `${300 + i * 100}ms`,
-                            }}
-                        >
-                            {/* Background Image */}
-                            <div
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.05]"
-                                style={{ backgroundImage: `url(${service.image})` }}
-                            />
-                            {/* Overlay */}
-                            <div
-                                className="absolute inset-0 transition-all duration-300"
-                                style={{
-                                    background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
-                                }}
-                            />
-                            {/* Label */}
-                            <div className="absolute bottom-0 left-0 right-0 p-6">
-                                <div className="text-2xl mb-1 transform transition-transform duration-300 group-hover:scale-110 origin-left">
-                                    {service.icon}
-                                </div>
-                                <h3
-                                    className="text-white font-serif text-xl font-bold leading-tight"
-                                >
-                                    {service.title}
-                                </h3>
-                                <p className="text-white/70 text-[11px] mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-2">
-                                    {service.desc}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* View All Button */}
-                <div className="text-center mt-12 pt-4">
-                    <Link
-                        href="#specializations"
-                        className="view-all-services-btn"
+                    <div 
+                        className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-5 px-5 md:mx-0 md:px-0 md:flex md:gap-5 md:overflow-visible transition-transform duration-500 ease-out"
+                        style={{ 
+                            transform: `translateX(calc(-${currentIndex} * (100% + 20px) / ${visibleCount}))`,
+                        }}
                     >
-                        View All →
-                    </Link>
+                        {services.map((service, i) => (
+                            <div
+                                key={service.title}
+                                onClick={() => router.push(`/services/${service.slug}`)}
+                                className={`shrink-0 group cursor-pointer overflow-hidden transition-all duration-500 md:min-w-0 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
+                                style={{
+                                    width: `calc((100% - ${(visibleCount - 1) * 20}px) / ${visibleCount})`,
+                                    height: "340px",
+                                    borderRadius: "16px",
+                                    position: "relative",
+                                    transitionDelay: `${300 + (i % visibleCount) * 100}ms`,
+                                    minWidth: "280px"
+                                }}
+                            >
+                                {/* Background Image */}
+                                <div
+                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.05]"
+                                    style={{ backgroundImage: `url(${service.image})` }}
+                                />
+                                {/* Overlay */}
+                                <div
+                                    className="absolute inset-0 transition-all duration-300"
+                                    style={{
+                                        background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
+                                    }}
+                                />
+                                {/* Label */}
+                                <div className="absolute bottom-0 left-0 right-0 p-6">
+                                    <div className="text-2xl mb-1 transform transition-transform duration-300 group-hover:scale-110 origin-left">
+                                        {service.icon}
+                                    </div>
+                                    <h3
+                                        className="text-white font-serif text-xl font-bold leading-tight"
+                                    >
+                                        {service.title}
+                                    </h3>
+                                    <p className="text-white/70 text-[11px] mt-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-2">
+                                        {service.desc}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-
-            <style jsx>{`
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-                .view-all-services-btn {
-                    border: 1.5px solid #2D5016;
-                    color: #2D5016;
-                    background: transparent;
-                    padding: 12px 28px;
-                    border-radius: 100px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                    text-decoration: none;
-                    display: inline-block;
-                }
-
-                .view-all-services-btn:hover {
-                    background: #2D5016;
-                    color: #FFFFFF !important;
-                }
-            `}</style>
         </section>
     )
 }

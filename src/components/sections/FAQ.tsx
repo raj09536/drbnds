@@ -7,13 +7,16 @@ import { faqs } from "@/data/staticData"
 export function FAQ() {
     const { ref, isVisible } = useScrollReveal(0.1)
     const [openIdx, setOpenIdx] = useState<number | null>(null)
+    const [showAll, setShowAll] = useState(false)
 
     const toggle = (i: number) => {
         setOpenIdx(openIdx === i ? null : i)
     }
 
+    const visibleFaqs = showAll ? faqs : faqs.slice(0, 5)
+
     return (
-        <section id="faq" ref={ref} style={{ background: "var(--cream)", padding: "96px 0" }}>
+        <section id="faq" ref={ref} className="section-padding" style={{ background: "var(--cream)" }}>
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="text-center mb-14">
@@ -47,7 +50,7 @@ export function FAQ() {
 
                 {/* Accordion */}
                 <div className="max-w-[800px] mx-auto flex flex-col gap-2">
-                    {faqs.map((faq, i) => {
+                    {visibleFaqs.map((faq, i) => {
                         const isOpen = openIdx === i
                         return (
                             <div
@@ -64,13 +67,13 @@ export function FAQ() {
                                 <button
                                     onClick={() => toggle(i)}
                                     className="w-full flex items-center justify-between cursor-pointer hover:bg-black/2 transition-colors duration-200"
-                                    style={{ padding: "20px 24px" }}
+                                    style={{ padding: "clamp(14px, 3vw, 20px) clamp(16px, 4vw, 24px)" }}
                                 >
                                     <span
                                         className="text-left"
                                         style={{
                                             fontFamily: "var(--font-dm-sans)",
-                                            fontSize: "15px",
+                                            fontSize: "clamp(13px, 2vw, 15px)",
                                             fontWeight: 500,
                                             color: "var(--charcoal)",
                                         }}
@@ -101,7 +104,7 @@ export function FAQ() {
                                 >
                                     <div
                                         style={{
-                                            padding: "0 24px 20px 24px",
+                                            padding: "0 clamp(16px, 4vw, 24px) clamp(14px, 3vw, 20px)",
                                             borderTop: "1px solid rgba(0,0,0,0.06)",
                                         }}
                                     >
@@ -122,6 +125,17 @@ export function FAQ() {
                         )
                     })}
                 </div>
+
+                {faqs.length > 5 && (
+                    <div className="text-center mt-8">
+                        <button
+                            onClick={() => setShowAll(!showAll)}
+                            className="view-all-btn"
+                        >
+                            {showAll ? "Show Less ↑" : "View More Questions ↓"}
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     )

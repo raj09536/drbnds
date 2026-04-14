@@ -2,23 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
-
-/* ─── SVG Icons ──────────────────────────────────────────────────────── */
-const PhoneIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-)
-const VideoIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-    </svg>
-)
-const PersonIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-    </svg>
-)
+import { motion, AnimatePresence } from "framer-motion"
+import { Phone, Video, User, MapPin, Calendar, Clock, ChevronRight, X, CheckCircle2, Loader2, Mail, MessageSquare } from "lucide-react"
 
 /* ─── Types and Hardcoded Data ────────────────────────────────────────── */
 interface Doctor {
@@ -60,28 +45,20 @@ const ALL_SLOTS = [
 
 /* ─── Sub-components ─────────────────────────────────────────────────── */
 const SectionDivider = ({ label }: { label: string }) => (
-    <div className="flex items-center gap-3" style={{ margin: "24px 0 16px" }}>
-        <div className="flex-1" style={{ height: "1px", background: "rgba(0,0,0,0.08)" }} />
-        <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "9px", fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: "var(--muted)" }}>{label}</span>
-        <div className="flex-1" style={{ height: "1px", background: "rgba(0,0,0,0.08)" }} />
+    <div className="flex items-center gap-3 my-6 md:my-8 text-[10px] md:text-xs">
+        <div className="flex-1 h-px bg-charcoal/5" />
+        <span className="font-bold text-charcoal/30 uppercase tracking-[3px] md:tracking-[5px]">{label}</span>
+        <div className="flex-1 h-px bg-charcoal/5" />
     </div>
 )
 
-const OptionalTag = () => (
-    <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "9px", fontWeight: 500, color: "var(--sage)", background: "rgba(61,107,82,0.1)", padding: "2px 8px", borderRadius: "999px", marginLeft: "6px", verticalAlign: "middle" }}>Optional</span>
-)
-
 const SectionLabel = ({ children, optional, htmlFor }: { children: React.ReactNode; optional?: boolean; htmlFor?: string }) => (
-    <label htmlFor={htmlFor} style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", letterSpacing: "2px", textTransform: "uppercase", color: "var(--muted)", fontWeight: 600, display: "block", marginBottom: "8px" }}>
-        {children}{optional && <OptionalTag />}
+    <label htmlFor={htmlFor} className="block text-xs font-bold text-mint uppercase tracking-widest mb-2.5">
+        {children} {optional && <span className="lowercase font-medium text-charcoal/30 tracking-normal">(optional)</span>}
     </label>
 )
 
-const inputStyle: React.CSSProperties = {
-    padding: "12px 14px", border: "2px solid rgba(0,0,0,0.1)", borderRadius: "10px",
-    fontFamily: "var(--font-dm-sans)", fontSize: "14px", color: "var(--forest)",
-    width: "100%", outline: "none", transition: "border 0.2s, box-shadow 0.2s",
-}
+const inputClass = "w-full px-4 py-3 md:py-3.5 bg-cream/30 border-2 border-transparent rounded-xl md:rounded-2xl text-forest font-medium placeholder:text-charcoal/20 outline-none focus:border-gold/50 focus:bg-white transition-all text-sm md:text-base";
 
 interface Props {
     onClose: () => void
@@ -102,7 +79,6 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
     const [phone, setPhone] = useState("")
     const [reason, setReason] = useState("")
     const [email, setEmail] = useState("")
-    const [location, setLocation] = useState("")
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
     const [bookedSlots, setBookedSlots] = useState<string[]>([])
 
@@ -118,7 +94,6 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
         setPhone("")
         setReason("")
         setEmail("")
-        setLocation("")
         setBooked(false)
         setCountdown(3)
         setBookedSlots([])
@@ -158,10 +133,8 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
         return () => clearInterval(timer)
     }, [booked, countdown, onClose, resetForm])
 
-    // Fetch booked slots when date OR doctor changes
     useEffect(() => {
         if (!date || !selectedDoctor) return
-
         const fetchBooked = async () => {
             const { data } = await supabase
                 .from('appointments')
@@ -169,10 +142,8 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
                 .eq('doctor_id', selectedDoctor.id)
                 .eq('appointment_date', date)
                 .in('status', ['pending', 'confirmed'])
-
             setBookedSlots(data?.map(a => a.time_slot) || [])
         }
-
         fetchBooked()
     }, [date, selectedDoctor])
 
@@ -212,82 +183,92 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
         } else {
             setBooked(true)
         }
-    }, [selectedDoctor, date, slot, mode, fullName, phone, reason, email, location])
+    }, [selectedDoctor, date, slot, mode, fullName, phone, reason, email])
 
-    const slotsToShow = showAllSlots ? ALL_SLOTS : ALL_SLOTS.slice(0, 10)
-    const modes: { key: "audio" | "video" | "physical"; icon: any; label: string }[] = [
-        { key: "audio", icon: PhoneIcon, label: "Audio Call" },
-        { key: "video", icon: VideoIcon, label: "Video Call" },
-        { key: "physical", icon: PersonIcon, label: "In Person" },
-    ]
+    const slotsToShow = showAllSlots ? ALL_SLOTS : ALL_SLOTS.slice(0, 9)
+    const modes = [
+        { key: "physical", icon: User, label: "In-Person" },
+        { key: "video", icon: Video, label: "Video" },
+        { key: "audio", icon: Phone, label: "Audio" },
+    ] as const;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(26,58,42,0.65)", backdropFilter: "blur(6px)" }} onClick={onClose}>
-            <div className="w-full relative flex flex-col bg-white rounded-[20px] shadow-2xl overflow-hidden animate-modal-in" style={{ maxWidth: "520px", maxHeight: "90vh" }} onClick={(e) => e.stopPropagation()}>
-                {/* HEADER */}
-                <div style={{ background: "var(--forest)", padding: "24px 28px 20px", flexShrink: 0 }}>
-                    <div className="flex items-start justify-between">
+        <div className="fixed inset-0 z-9999 flex items-end md:items-center justify-center bg-forest/80 backdrop-blur-md" onClick={onClose}>
+            <motion.div 
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                className="w-full md:max-w-xl h-[92vh] md:h-auto md:max-h-[85vh] bg-white rounded-t-[2.5rem] md:rounded-[2.5rem] flex flex-col overflow-hidden shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="bg-forest px-8 py-7 md:py-8 shrink-0">
+                    <div className="flex items-center justify-between">
                         <div>
-                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", letterSpacing: "4px", textTransform: "uppercase", color: "var(--mint)", fontWeight: 500 }}>Step {step} of 2</span>
-                            <h3 className="mt-1" style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "26px", fontWeight: 400, color: "white" }}>
-                                {step === 1 ? "Choose Your Doctor" : "Book Appointment"}
+                            <span className="text-mint font-bold uppercase tracking-[4px] text-[10px] md:text-xs">Step {step} of 2</span>
+                            <h3 className="text-white font-bold leading-tight mt-1" style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "28px" }}>
+                                {step === 1 ? "Choose Your Doctor" : "Clinical Registration"}
                             </h3>
                         </div>
                         {!booked && (
-                            <button onClick={onClose} className="shrink-0 flex items-center justify-center rounded-full bg-white/10 border-none text-white text-xl cursor-pointer hover:bg-white/20 transition-all" style={{ width: "36px", height: "36px" }}>×</button>
+                            <button 
+                                onClick={onClose} 
+                                className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
+                            >
+                                <X size={22} />
+                            </button>
                         )}
                     </div>
                 </div>
 
-                {/* BODY */}
-                <div className="overflow-y-auto flex-1" style={{ padding: "24px 28px 28px" }}>
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto px-6 md:px-10 py-8 scroll-smooth">
                     {booked ? (
-                        <div className="text-center py-12 space-y-4">
-                            <div className="w-16 h-16 bg-cream rounded-full flex items-center justify-center mx-auto mb-4 text-forest text-2xl">✓</div>
-                            <h3 style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "28px", color: "var(--forest)" }}>Appointment Booked!</h3>
-                            <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", color: "var(--muted)" }}>
-                                We have received your request and will contact you shortly.
+                        <div className="flex flex-col items-center text-center justify-center h-full py-10">
+                            <div className="w-20 h-20 bg-mint/10 text-mint rounded-full flex items-center justify-center mb-6">
+                                <CheckCircle2 size={40} strokeWidth={2.5} />
+                            </div>
+                            <h3 className="text-2xl font-bold text-forest mb-3" style={{ fontFamily: "var(--font-cormorant)" }}>Clinical Success!</h3>
+                            <p className="text-charcoal/50 font-medium leading-relaxed max-w-sm">
+                                Your appointment is registered. Our coordinator will contact you shortly to confirm the clinical schedule.
                             </p>
-                            <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", fontWeight: 600, color: "var(--sage)" }}>
-                                Closing in {countdown}...
-                            </p>
+                            <div className="mt-10 px-6 py-3 bg-cream rounded-full text-mint font-bold text-xs uppercase tracking-widest">
+                                Auto-closing in {countdown}s
+                            </div>
                         </div>
                     ) : step === 1 ? (
-                        <div className="space-y-4">
-                            <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "var(--muted)" }}>Select the doctor you&apos;d like to consult with:</p>
-                            <div className="space-y-3">
+                        <div className="space-y-6">
+                            <p className="text-charcoal/40 font-bold uppercase tracking-widest text-[11px]">Select Clinical Specialist</p>
+                            
+                            <div className="grid grid-cols-1 gap-4">
                                 {DOCTORS.map((doc) => {
                                     const isSelected = selectedDoctor?.id === doc.id
                                     return (
                                         <button
                                             key={doc.id}
                                             onClick={() => setSelectedDoctor(doc)}
-                                            className="w-full flex items-center text-left gap-4 p-4 rounded-xl transition-all border-none relative cursor-pointer"
+                                            className="group relative flex items-center text-left gap-5 p-5 rounded-3xl border-2 transition-all cursor-pointer"
                                             style={{
-                                                background: isSelected ? "#fdf8ee" : "white",
-                                                border: isSelected ? "2px solid var(--gold)" : "2px solid rgba(0,0,0,0.08)",
-                                                boxShadow: isSelected ? "0 0 0 4px rgba(201,168,76,0.12)" : "none",
-                                                overflow: "visible"
+                                                background: isSelected ? "var(--cream)" : "white",
+                                                borderColor: isSelected ? "var(--gold)" : "var(--cream)",
+                                                boxShadow: isSelected ? "0 12px 24px -12px rgba(201,168,76,0.3)" : "none",
                                             }}
                                         >
-                                            <div className="shrink-0 rounded-full overflow-hidden border-2 border-white" style={{ width: "52px", height: "52px" }}>
-                                                <img src={doc.photo} alt={doc.name} className="w-full h-full object-cover" />
+                                            <div className="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
+                                                <img src={doc.photo} alt={doc.name} className="w-full h-full object-cover rounded-2xl shadow-md border-2 border-white" />
+                                                {isSelected && (
+                                                    <div className="absolute -top-2 -right-2 bg-gold text-forest rounded-full p-1 border-4 border-white">
+                                                        <CheckCircle2 size={14} strokeWidth={3} />
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="flex-1">
-                                                <h4 style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "12px", fontWeight: 600, color: "var(--forest)", margin: 0 }}>{doc.name}</h4>
-                                                <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "var(--muted)", margin: "2px 0" }}>{doc.spec}</p>
-                                                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--sage)", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px" }}>
-                                                    📍 {doc.clinic}
-                                                </span>
-                                            </div>
-                                            <div
-                                                className="shrink-0 w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center"
-                                                style={{
-                                                    borderColor: isSelected ? "var(--gold)" : "#d1d5db",
-                                                    background: isSelected ? "var(--gold)" : "transparent"
-                                                }}
-                                            >
-                                                {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
+                                                <h4 className="text-forest font-bold leading-tight" style={{ fontFamily: "var(--font-cormorant)", fontSize: "20px" }}>{doc.name}</h4>
+                                                <p className="text-mint font-bold text-[10px] uppercase tracking-widest mt-1">{doc.spec}</p>
+                                                <div className="flex items-center gap-2 text-charcoal/40 font-medium mt-2 text-xs">
+                                                    <MapPin size={12} className="text-gold" />
+                                                    {doc.clinic}
+                                                </div>
                                             </div>
                                         </button>
                                     )
@@ -297,159 +278,166 @@ export function AppointmentModal({ onClose, preSelectedDoctorId }: Props) {
                             <button
                                 onClick={() => step === 1 && selectedDoctor && setStep(2)}
                                 disabled={!selectedDoctor}
-                                className="w-full mt-6 py-4 rounded-xl border-none font-semibold transition-all cursor-pointer flex items-center justify-center gap-2"
-                                style={{
-                                    background: selectedDoctor ? "var(--forest)" : "#d1d5db",
-                                    color: "white",
-                                    fontFamily: "var(--font-dm-sans)",
-                                    fontSize: "14px"
-                                }}
+                                className="w-full mt-8 h-14 md:h-16 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 bg-forest text-white shadow-xl shadow-forest/10 hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:grayscale"
                             >
-                                Continue →
+                                Continue To Details
+                                <ChevronRight size={20} />
                             </button>
                         </div>
                     ) : (
-                        <div>
-                            <div className="flex items-center gap-3 bg-cream rounded-xl p-3 mb-6">
-                                <div className="shrink-0 rounded-full overflow-hidden w-8 h-8">
-                                    <img src={selectedDoctor?.photo} alt={selectedDoctor?.name} className="w-full h-full object-cover" />
-                                </div>
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                            {/* Summary Card */}
+                            <div className="flex items-center gap-4 bg-cream/40 p-4 rounded-[1.5rem] border border-gold-light/20">
+                                <img src={selectedDoctor?.photo} alt={selectedDoctor?.name} className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm" />
                                 <div className="flex-1">
-                                    <p className="font-semibold text-sm text-forest m-0">{selectedDoctor?.name}</p>
-                                    <p className="text-[10px] text-muted m-0">{selectedDoctor?.clinic}</p>
+                                    <p className="text-forest font-bold text-sm leading-tight">{selectedDoctor?.name}</p>
+                                    <p className="text-[10px] font-bold text-mint uppercase tracking-widest mt-0.5">{selectedDoctor?.clinic}</p>
                                 </div>
-                                <button onClick={() => setStep(1)} className="bg-transparent border-none text-sage text-xs font-bold cursor-pointer hover:text-forest">Change →</button>
+                                <button onClick={() => setStep(1)} className="text-[10px] font-bold text-gold hover:text-forest uppercase tracking-widest border-2 border-gold/20 px-3 py-1.5 rounded-full transition-all">Change</button>
                             </div>
 
-                            <SectionDivider label="Booking Details" />
+                            <SectionDivider label="Logistics" />
 
-                            <SectionLabel>Mode of Consultation</SectionLabel>
-                            <div className="grid grid-cols-3 gap-3 mb-5">
-                                {modes.map((m) => {
-                                    const active = mode === m.key
-                                    return (
-                                        <button
-                                            key={m.key}
-                                            onClick={() => setMode(m.key)}
-                                            className="flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all cursor-pointer"
-                                            style={{
-                                                background: active ? "var(--forest)" : "white",
-                                                borderColor: active ? "var(--gold)" : "rgba(0,0,0,0.1)",
-                                                color: active ? "white" : "var(--muted)"
-                                            }}
-                                        >
-                                            <m.icon />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">{m.label}</span>
-                                        </button>
-                                    )
-                                })}
-                            </div>
+                            <div className="space-y-6">
+                                <div>
+                                    <SectionLabel>Consultation Format</SectionLabel>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {modes.map((m) => {
+                                            const active = mode === m.key
+                                            return (
+                                                <button
+                                                    key={m.key}
+                                                    onClick={() => setMode(m.key)}
+                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all cursor-pointer"
+                                                    style={{
+                                                        background: active ? "var(--forest)" : "var(--cream)/20",
+                                                        borderColor: active ? "var(--gold)" : "transparent",
+                                                        color: active ? "white" : "var(--forest)"
+                                                    }}
+                                                >
+                                                    <m.icon size={20} strokeWidth={active ? 2.5 : 2} />
+                                                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">{m.label}</span>
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
 
-                            <div className="mb-5">
-                                <SectionLabel htmlFor="appt-date">Preferred Date</SectionLabel>
-                                <input id="appt-date" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
-                            </div>
-
-                            <div className="mb-6">
-                                <SectionLabel>Available Slots</SectionLabel>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    {slotsToShow.map((s) => {
-                                        const isBooked = bookedSlots.includes(s)
-                                        const isSelected = slot === s
-
-                                        return (
-                                            <button
-                                                key={s}
-                                                disabled={isBooked}
-                                                onClick={() => !isBooked && setSlot(s)}
-                                                style={{
-                                                    padding: '9px 6px',
-                                                    borderRadius: 8,
-                                                    fontSize: 12,
-                                                    fontWeight: 500,
-                                                    fontFamily: "var(--font-dm-sans)",
-                                                    cursor: isBooked ? 'not-allowed' : 'pointer',
-                                                    border: `1.5px solid ${isBooked ? 'rgba(196,113,90,0.4)' :
-                                                        isSelected ? '#c9a84c' :
-                                                            'rgba(0,0,0,0.1)'
-                                                        }`,
-                                                    background:
-                                                        isBooked ? '#fde8e4' :
-                                                            isSelected ? '#fdf8ee' :
-                                                                'white',
-                                                    color:
-                                                        isBooked ? '#c4715a' :
-                                                            isSelected ? '#1a3a2a' :
-                                                                '#2c2c2c',
-                                                    opacity: isBooked ? 0.7 : 1,
-                                                    position: 'relative',
-                                                }}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <SectionLabel htmlFor="appt-date">Clinical Date</SectionLabel>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-mint/40 pointer-events-none" size={18} />
+                                            <input id="appt-date" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} className={`${inputClass} pl-12`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <SectionLabel>Select Time Slot</SectionLabel>
+                                        <div className="relative">
+                                            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-mint/40 pointer-events-none" size={18} />
+                                            <select 
+                                                className={`${inputClass} appearance-none pl-12 pr-10`}
+                                                value={slot || ""} 
+                                                onChange={(e) => setSlot(e.target.value)}
                                             >
-                                                {s}
-                                                {isBooked && (
-                                                    <span style={{
-                                                        display: 'block',
-                                                        fontSize: 9,
-                                                        color: '#c4715a',
-                                                        fontWeight: 700,
-                                                        marginTop: 1
-                                                    }}>
-                                                        Booked
-                                                    </span>
-                                                )}
-                                            </button>
-                                        )
-                                    })}
+                                                <option value="" disabled>Choose Slot</option>
+                                                {ALL_SLOTS.map(s => (
+                                                    <option key={s} value={s} disabled={bookedSlots.includes(s)}>
+                                                        {s} {bookedSlots.includes(s) ? "(Booked)" : ""}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-mint/40">
+                                                <ChevronRight size={16} className="rotate-90" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                {ALL_SLOTS.length > 10 && !showAllSlots && (
-                                    <button
-                                        onClick={() => setShowAllSlots(true)}
-                                        className="mt-3 text-[11px] font-bold text-sage underline cursor-pointer bg-transparent border-none"
-                                    >
-                                        Show all slots
-                                    </button>
-                                )}
+
+                                {/* Desktop grid for slots - only visible on wide screens as alternative */}
+                                <div className="hidden md:block">
+                                   <SectionLabel>Quick Select Slots</SectionLabel>
+                                   <div className="grid grid-cols-3 gap-2">
+                                        {slotsToShow.map((s) => {
+                                            const isSelected = slot === s;
+                                            const isBooked = bookedSlots.includes(s);
+                                            return (
+                                                <button
+                                                    key={s}
+                                                    disabled={isBooked}
+                                                    onClick={() => setSlot(s)}
+                                                    className="py-2.5 px-2 rounded-xl text-[11px] font-bold border-2 transition-all cursor-pointer"
+                                                    style={{
+                                                        background: isSelected ? "var(--gold)" : "white",
+                                                        borderColor: isSelected ? "var(--gold)" : "var(--cream)",
+                                                        color: isSelected ? "white" : isBooked ? "var(--charcoal/20)" : "var(--forest)",
+                                                        opacity: isBooked ? 0.3 : 1
+                                                    }}
+                                                >
+                                                    {s}
+                                                </button>
+                                            )
+                                        })}
+                                   </div>
+                                   {!showAllSlots && (
+                                       <button onClick={() => setShowAllSlots(true)} className="mt-3 text-[10px] font-bold text-mint uppercase tracking-widest hover:text-gold transition-colors block ml-auto">Load More Slots ↓</button>
+                                   )}
+                                </div>
                             </div>
 
-                            <SectionDivider label="Your Information" />
+                            <SectionDivider label="Patient Identity" />
 
                             <div className="space-y-4">
-                                <div>
-                                    <SectionLabel htmlFor="name">Full Name</SectionLabel>
-                                    <input id="name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Jane Doe" style={inputStyle} />
+                                <div className="relative">
+                                    <SectionLabel htmlFor="name">Full Identity Name</SectionLabel>
+                                    <div className="relative">
+                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-mint/40" size={18} />
+                                        <input id="name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Rahul Sharma" className={`${inputClass} pl-12`} />
+                                    </div>
                                 </div>
-                                <div>
-                                    <SectionLabel htmlFor="phone">Phone Number</SectionLabel>
-                                    <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 99999 99999" style={inputStyle} />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <SectionLabel htmlFor="phone">Phone Number</SectionLabel>
+                                        <div className="relative">
+                                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-mint/40" size={18} />
+                                            <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 81919 19949" className={`${inputClass} pl-12 text-sm`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <SectionLabel htmlFor="email" optional>Email Address</SectionLabel>
+                                        <div className="relative">
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-mint/40" size={18} />
+                                            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@email.com" className={`${inputClass} pl-12 text-sm`} />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <SectionLabel htmlFor="reason" optional>Reason for visit</SectionLabel>
-                                    <textarea id="reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Tell us how we can help..." style={{ ...inputStyle, height: '80px', resize: 'none' }} />
+                                <div className="relative">
+                                    <SectionLabel htmlFor="reason" optional>Reason for consultation</SectionLabel>
+                                    <div className="relative">
+                                        <MessageSquare className="absolute left-4 top-4 text-mint/40" size={18} />
+                                        <textarea id="reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Briefly describe clinical symptoms..." className={`${inputClass} pl-12 min-h-[100px] resize-none pt-4`} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <button
-                                onClick={handleBook}
-                                disabled={loading}
-                                className="w-full mt-8 py-4 rounded-xl border-none font-bold text-forest transition-all cursor-pointer"
-                                style={{
-                                    background: 'var(--gold)',
-                                    color: 'var(--forest)',
-                                    boxShadow: '0 10px 25px rgba(201,168,76,0.3)',
-                                    opacity: loading ? 0.7 : 1
-                                }}
-                            >
-                                {loading ? 'Processing...' : 'Confirm Appointment →'}
-                            </button>
+                            <div className="sticky bottom-0 bg-white pt-4 pb-2 md:relative md:p-0">
+                                <button
+                                    onClick={handleBook}
+                                    disabled={loading}
+                                    className="w-full h-14 md:h-16 rounded-2xl font-bold flex items-center justify-center gap-3 bg-gold text-forest shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all cursor-pointer"
+                                >
+                                    {loading ? (
+                                        <><Loader2 className="animate-spin" size={20} /> Registering...</>
+                                    ) : (
+                                        <>Finalize Appointment Registration <ChevronRight size={20} strokeWidth={3} /></>
+                                    )}
+                                </button>
+                                {fieldErrors.general && <p className="text-red-500 text-[10px] font-bold text-center mt-3 uppercase tracking-widest">{fieldErrors.general}</p>}
+                            </div>
                         </div>
                     )}
                 </div>
-            </div>
-
-            <style jsx>{`
-                @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-                .animate-modal-in { animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-            `}</style>
+            </motion.div>
         </div>
     )
 }

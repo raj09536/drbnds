@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { supabase } from "@/lib/supabase"
@@ -27,21 +27,38 @@ export function TestimonialsForm() {
     const [hoverRating, setHoverRating] = useState(0)
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
+    const [reviewType, setReviewType] = useState<'text' | 'video' | 'audio'>('text')
+    const [mediaFile, setMediaFile] = useState<File | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Fetch doctors from Supabase
     useEffect(() => {
         supabase
             .from("doctors")
             .select("id, name, photo_url, specialization, clinic_id, clinics(name)")
-            .eq("is_available", true) // DB has is_available instead of is_active
+            .eq("is_available", true)
             .order("id")
             .then(({ data }) => { if (data) setDoctors(data as any) })
     }, [])
 
+    const handleTypeChange = (type: 'text' | 'video' | 'audio') => {
+        setReviewType(type)
+        setMediaFile(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!name.trim() || !review.trim() || rating === 0 || !selectedDoctorId) {
+        if (!name.trim() || rating === 0 || !selectedDoctorId) {
             toast.error("Please fill in all fields and select a rating.")
+            return
+        }
+        if (reviewType === 'text' && !review.trim()) {
+            toast.error("Please write your review.")
+            return
+        }
+        if ((reviewType === 'video' || reviewType === 'audio') && !mediaFile) {
+            toast.error("Please upload a file.")
             return
         }
 
@@ -49,33 +66,84 @@ export function TestimonialsForm() {
 
         const selectedDoctor = doctors.find((d) => d.id === selectedDoctorId)
 
-        const { error } = await supabase.from("feedback").insert({
-            patient_name: name.trim(),
-            review: review.trim(),
-            rating,
-            doctor_id: selectedDoctorId,
-            clinic_id: selectedDoctor?.clinic_id,
-            is_approved: false,
-        })
+        if (reviewType === 'text') {
+            // Existing text flow — insert to feedback table
+            const { error } = await supabase.from("feedback").insert({
+                patient_name: name.trim(),
+                review: review.trim(),
+                rating,
+                doctor_id: selectedDoctorId,
+                clinic_id: selectedDoctor?.clinic_id,
+                is_approved: false,
+            })
 
-        setLoading(false)
+            setLoading(false)
 
-        if (error) {
-            console.error("Testimonial error:", error)
-            toast.error("Failed to submit testimonial. Please try again.")
+            if (error) {
+                console.error("Testimonial error:", error)
+                toast.error("Failed to submit testimonial. Please try again.")
+            } else {
+                setSubmitted(true)
+                setName("")
+                setReview("")
+                setRating(0)
+                setSelectedDoctorId("")
+            }
         } else {
-            setSubmitted(true)
-            setName("")
-            setReview("")
-            setRating(0)
-            setSelectedDoctorId("")
+            // Video / Audio — upload file then insert to testimonials table
+            const filePath = `${reviewType}/${Date.now()}_${mediaFile!.name}`
+            const { error: uploadError } = await supabase.storage
+                .from("clinic-media")
+                .upload(filePath, mediaFile!)
+
+            if (uploadError) {
+                setLoading(false)
+                console.error("Upload error:", uploadError)
+                toast.error("Failed to upload file. Please try again.")
+                return
+            }
+
+            const { data: urlData } = supabase.storage
+                .from("clinic-media")
+                .getPublicUrl(filePath)
+
+            const mediaUrl = urlData?.publicUrl || null
+
+            const insertData = {
+                patient_name: name.trim(),
+                review: review.trim(),
+                rating,
+                doctor_id: selectedDoctorId,
+                type: reviewType,
+                media_url: mediaUrl,
+                is_active: false,
+            }
+
+            console.log("Inserting testimonial data:", insertData)
+
+            const { error: insertError } = await supabase.from("testimonials").insert(insertData)
+
+            setLoading(false)
+
+            if (insertError) {
+                console.error("Testimonial error:", JSON.stringify(insertError, null, 2))
+                toast.error("Failed to submit testimonial. Please try again.")
+            } else {
+                setSubmitted(true)
+                setName("")
+                setReview("")
+                setRating(0)
+                setSelectedDoctorId("")
+                setMediaFile(null)
+                if (fileInputRef.current) fileInputRef.current.value = ""
+            }
         }
     }
 
     const displayRating = hoverRating || rating
 
     return (
-        <section ref={ref} style={{ background: "var(--cream)", padding: "96px 0" }}>
+        <section ref={ref} className="section-padding" style={{ background: "var(--cream)" }}>
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="text-center mb-14">
@@ -123,7 +191,7 @@ export function TestimonialsForm() {
 
                 {/* Form Card */}
                 <div
-                    className={`max-w-[560px] mx-auto transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+                    className={`max-w-[560px] mx-auto w-full px-0 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                     style={{ transitionDelay: "300ms" }}
                 >
                     {submitted ? (
@@ -149,7 +217,7 @@ export function TestimonialsForm() {
                                 Your testimonial has been submitted for review. Once approved by our team, it will be featured in our Patient Stories section.
                             </p>
                             <button
-                                onClick={() => setSubmitted(false)}
+                                onClick={() => { setSubmitted(false); setReviewType('text') }}
                                 className="mt-8 cursor-pointer transition-all duration-200 hover:bg-sage"
                                 style={{
                                     padding: "12px 28px",
@@ -172,10 +240,43 @@ export function TestimonialsForm() {
                             style={{
                                 background: "white",
                                 borderRadius: "20px",
-                                padding: "40px",
+                                padding: "clamp(24px, 5vw, 40px)",
                                 boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
                             }}
                         >
+                            {/* Review Type Selector */}
+                            <div className="mb-7">
+                                <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 600, color: "var(--forest)", marginBottom: "10px" }}>
+                                    Review type
+                                </p>
+                                <div className="flex gap-2">
+                                    {([
+                                        { type: 'text', label: '✍️ Text' },
+                                        { type: 'video', label: '🎥 Video' },
+                                        { type: 'audio', label: '🎙️ Audio' },
+                                    ] as const).map(({ type, label }) => (
+                                        <button
+                                            key={type}
+                                            type="button"
+                                            onClick={() => handleTypeChange(type)}
+                                            className="flex-1 cursor-pointer transition-all duration-200"
+                                            style={{
+                                                padding: "10px 8px",
+                                                borderRadius: "10px",
+                                                border: `2px solid ${reviewType === type ? "var(--gold)" : "rgba(0,0,0,0.1)"}`,
+                                                background: reviewType === type ? "var(--gold)" : "white",
+                                                color: reviewType === type ? "white" : "var(--charcoal)",
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "13px",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Star Rating */}
                             <div className="text-center mb-8">
                                 <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 600, color: "var(--forest)", marginBottom: "12px" }}>
@@ -256,7 +357,7 @@ export function TestimonialsForm() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Enter your full name"
-                                    className="focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                    className="w-full focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                     style={{
                                         width: "100%",
                                         border: "1px solid rgba(0,0,0,0.1)",
@@ -272,36 +373,101 @@ export function TestimonialsForm() {
                                 />
                             </div>
 
-                            {/* Review */}
+                            {/* Review — text textarea OR media upload */}
                             <div className="mb-5">
-                                <label htmlFor="fb-review" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 500, color: "var(--charcoal)", marginBottom: "8px", display: "block" }}>
-                                    Your Review *
-                                </label>
-                                <textarea
-                                    id="fb-review"
-                                    required
-                                    rows={4}
-                                    value={review}
-                                    onChange={(e) => setReview(e.target.value)}
-                                    maxLength={500}
-                                    placeholder="Share your experience with us..."
-                                    className="resize-none focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
-                                    style={{
-                                        width: "100%",
-                                        border: "1px solid rgba(0,0,0,0.1)",
-                                        borderRadius: "10px",
-                                        padding: "12px 16px",
-                                        fontFamily: "var(--font-dm-sans)",
-                                        fontSize: "14px",
-                                        color: "var(--charcoal)",
-                                        background: "white",
-                                        outline: "none",
-                                        transition: "border-color 0.2s, box-shadow 0.2s",
-                                    }}
-                                />
-                                <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--muted)", marginTop: "4px", textAlign: "right" }}>
-                                    {review.length}/500
-                                </p>
+                                {reviewType === 'text' ? (
+                                    <>
+                                        <label htmlFor="fb-review" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 500, color: "var(--charcoal)", marginBottom: "8px", display: "block" }}>
+                                            Your Review *
+                                        </label>
+                                        <textarea
+                                            id="fb-review"
+                                            required
+                                            rows={4}
+                                            value={review}
+                                            onChange={(e) => setReview(e.target.value)}
+                                            maxLength={500}
+                                            placeholder="Share your experience with us..."
+                                            className="w-full resize-none focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                            style={{
+                                                width: "100%",
+                                                border: "1px solid rgba(0,0,0,0.1)",
+                                                borderRadius: "10px",
+                                                padding: "12px 16px",
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "14px",
+                                                color: "var(--charcoal)",
+                                                background: "white",
+                                                outline: "none",
+                                                transition: "border-color 0.2s, box-shadow 0.2s",
+                                            }}
+                                        />
+                                        <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--muted)", marginTop: "4px", textAlign: "right" }}>
+                                            {review.length}/500
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <label style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 500, color: "var(--charcoal)", marginBottom: "8px", display: "block" }}>
+                                            {reviewType === 'video' ? 'Upload your video testimonial *' : 'Upload your audio message *'}
+                                        </label>
+                                        <label
+                                            className="flex flex-col items-center justify-center cursor-pointer w-full transition-colors duration-200 hover:bg-[#fdf8ee]"
+                                            style={{
+                                                border: "2px dashed var(--gold)",
+                                                borderRadius: "12px",
+                                                padding: "32px 20px",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            <span style={{ fontSize: "32px", marginBottom: "8px" }}>
+                                                {reviewType === 'video' ? '🎥' : '🎙️'}
+                                            </span>
+                                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 600, color: "var(--forest)" }}>
+                                                {mediaFile ? mediaFile.name : `Click to choose ${reviewType} file`}
+                                            </span>
+                                            {!mediaFile && (
+                                                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "var(--muted)", marginTop: "4px" }}>
+                                                    {reviewType === 'video' ? 'MP4, WebM — Max 50MB' : 'MP3, WAV, WebM'}
+                                                </span>
+                                            )}
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept={reviewType === 'video' ? "video/mp4,video/webm" : "audio/mpeg,audio/wav,audio/webm"}
+                                                className="sr-only"
+                                                onChange={(e) => setMediaFile(e.target.files?.[0] || null)}
+                                            />
+                                        </label>
+                                        {/* Optional text context */}
+                                        <div className="mt-4">
+                                            <label htmlFor="fb-review-media" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 500, color: "var(--charcoal)", marginBottom: "8px", display: "block" }}>
+                                                Add a written note (optional)
+                                            </label>
+                                            <textarea
+                                                id="fb-review-media"
+                                                rows={3}
+                                                value={review}
+                                                onChange={(e) => setReview(e.target.value)}
+                                                maxLength={500}
+                                                placeholder="A short description of your experience..."
+                                                className="w-full resize-none focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                                style={{
+                                                    width: "100%",
+                                                    border: "1px solid rgba(0,0,0,0.1)",
+                                                    borderRadius: "10px",
+                                                    padding: "12px 16px",
+                                                    fontFamily: "var(--font-dm-sans)",
+                                                    fontSize: "14px",
+                                                    color: "var(--charcoal)",
+                                                    background: "white",
+                                                    outline: "none",
+                                                    transition: "border-color 0.2s, box-shadow 0.2s",
+                                                }}
+                                            />
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             {/* Submit */}

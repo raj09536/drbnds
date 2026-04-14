@@ -8,7 +8,7 @@ export function Locations() {
     const { ref, isVisible } = useScrollReveal(0.1)
 
     return (
-        <section id="location" ref={ref} style={{ background: "white", padding: "96px 0" }}>
+        <section id="location" ref={ref} className="section-padding" style={{ background: "white" }}>
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="text-center max-w-2xl mx-auto mb-14">
@@ -53,7 +53,7 @@ export function Locations() {
                 </div>
 
                 {/* Clinic Cards */}
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {clinics.map((clinic, i) => (
                         <div
                             key={clinic.id}
@@ -173,8 +173,8 @@ export function Locations() {
                             <iframe
                                 src={clinic.map_embed}
                                 width="100%"
-                                height="240"
-                                style={{ border: "none" }}
+                                className="w-full rounded-xl"
+                                style={{ border: "none", height: "clamp(220px, 35vw, 400px)" }}
                                 allowFullScreen
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"

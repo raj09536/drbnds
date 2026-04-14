@@ -1,7 +1,6 @@
 import { TopBar } from "@/components/layout/TopBar"
 import { Navbar } from "@/components/Navbar"
 import { Hero } from "@/components/Hero"
-import { StatsBar } from "@/components/sections/StatsBar"
 import { AboutUs } from "@/components/sections/AboutUs"
 import { Specializations } from "@/components/sections/Specializations"
 import { Services } from "@/components/Services"
@@ -22,7 +21,6 @@ export default function Home() {
       <TopBar />
       <Navbar />
       <Hero />
-      <StatsBar />
       <AboutUs />
       <Specializations />
       <Services />

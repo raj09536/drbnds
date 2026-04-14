@@ -77,7 +77,7 @@ export function ContactForm() {
     const inputStyle: React.CSSProperties = {
         border: "1px solid rgba(0,0,0,0.1)",
         borderRadius: "8px",
-        padding: "12px 16px",
+        padding: "clamp(10px, 2vw, 14px) 14px",
         fontFamily: "var(--font-dm-sans)",
         fontSize: "14px",
         width: "100%",
@@ -88,9 +88,9 @@ export function ContactForm() {
     }
 
     return (
-        <section id="contact" ref={ref} style={{ background: "var(--cream)", padding: "96px 0" }}>
+        <section id="contact" ref={ref} className="section-padding" style={{ background: "var(--cream)" }}>
             <div className="container mx-auto px-6">
-                <div className="grid lg:grid-cols-2 gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                     {/* Left: Contact Info */}
                     <div
                         className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
@@ -230,7 +230,7 @@ export function ContactForm() {
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="John Doe"
-                                        className="mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                        className="w-full mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                         style={inputStyle}
                                     />
                                 </div>
@@ -250,7 +250,7 @@ export function ContactForm() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         placeholder="you@example.com"
-                                        className="mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                        className="w-full mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                         style={inputStyle}
                                     />
                                 </div>
@@ -269,7 +269,7 @@ export function ContactForm() {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         placeholder="+91-XXXXXXXXXX"
-                                        className="mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                        className="w-full mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                         style={inputStyle}
                                     />
                                 </div>
@@ -286,7 +286,7 @@ export function ContactForm() {
                                         name="clinic"
                                         value={formData.clinic}
                                         onChange={handleChange}
-                                        className="mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                        className="w-full mt-2 focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                         style={{ ...inputStyle, appearance: "auto" }}
                                     >
                                         <option value="">Choose a clinic...</option>
@@ -309,7 +309,7 @@ export function ContactForm() {
                                         value={formData.message}
                                         onChange={handleChange}
                                         placeholder="Tell us about your concern..."
-                                        className="mt-2 resize-none focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
+                                        className="w-full mt-2 resize-none focus:border-sage focus:shadow-[0_0_0_3px_rgba(61,107,82,0.15)]"
                                         style={inputStyle}
                                     />
                                 </div>
@@ -317,7 +317,7 @@ export function ContactForm() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full rounded-lg transition-all duration-200 hover:bg-sage hover:-translate-y-px cursor-pointer disabled:opacity-60"
+                                    className="w-full sm:w-auto rounded-lg transition-all duration-200 hover:bg-sage hover:-translate-y-px cursor-pointer disabled:opacity-60"
                                     style={{
                                         background: "var(--forest)",
                                         color: "white",

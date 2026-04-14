@@ -224,3 +224,30 @@
   background: #2D5016;
   color: #ffffff !important;
 }
+
+/* ── Responsive Section Padding ── */
+.section-padding {
+  padding: 60px 0;
+}
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 96px 0;
+  }
+}
+
+.container-padding {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+@media (min-width: 768px) {
+  .container-padding {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+@media (min-width: 1024px) {
+  .container-padding {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
