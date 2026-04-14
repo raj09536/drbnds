@@ -103,7 +103,10 @@ export function Testimonials() {
 
     if (!loaded || testimonials.length === 0) return null
 
-    const t = filteredTestimonials[current]
+    const safeIndex = filteredTestimonials.length > 0
+        ? current % filteredTestimonials.length
+        : 0
+    const t = filteredTestimonials[safeIndex] ?? null
 
     const getYouTubeId = (url: string | null) => {
         if (!url) return null;
@@ -112,7 +115,7 @@ export function Testimonials() {
         return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    const youtubeId = t?.type === 'video' ? getYouTubeId(t.media_url) : null;
+    const youtubeId = t?.type === 'video' ? getYouTubeId(t?.media_url ?? null) : null;
 
     return (
         <section
@@ -183,8 +186,9 @@ export function Testimonials() {
                         onTouchEnd={handleTouchEnd}
                     >
                         <AnimatePresence mode="wait">
+                            {t && (
                             <motion.div
-                                key={`${activeFilter}-${current}`}
+                                key={`${activeFilter}-${safeIndex}`}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
@@ -194,7 +198,7 @@ export function Testimonials() {
                                 {/* Type Badge */}
                                 <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20">
                                     <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold text-white uppercase tracking-widest border border-white/5">
-                                        {t.type === 'text' && <><MessageSquare size={12} /> Text</>}
+                                        {(t.type === 'text' || !t.type) && <><MessageSquare size={12} /> Text</>}
                                         {t.type === 'audio' && <><Mic size={12} /> Audio</>}
                                         {t.type === 'video' && <><Play size={12} /> Video</>}
                                     </span>
@@ -214,7 +218,8 @@ export function Testimonials() {
                                             <audio
                                                 controls
                                                 src={t.media_url}
-                                                className="w-full h-12 rounded-full opacity-80"
+                                                className="w-full rounded-full opacity-80"
+                                                style={{ minHeight: '54px' }}
                                             >
                                                 Your browser does not support audio.
                                             </audio>
@@ -269,6 +274,7 @@ export function Testimonials() {
                                     </div>
                                 </div>
                             </motion.div>
+                            )}
                         </AnimatePresence>
 
                         {/* Navigation */}

@@ -68,7 +68,6 @@ export async function PATCH(req: NextRequest) {
             .eq("id", id)
         if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     } else if (action === "reject") {
-        // Try is_rejected first, fall back to delete
         const { error } = await supabaseAdmin
             .from("testimonials")
             .update({ is_rejected: true })
@@ -78,6 +77,13 @@ export async function PATCH(req: NextRequest) {
         } else if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 })
         }
+    } else if (action === "remove") {
+        // Remove from website — set is_active = false (bypasses RLS)
+        const { error } = await supabaseAdmin
+            .from("testimonials")
+            .update({ is_active: false })
+            .eq("id", id)
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

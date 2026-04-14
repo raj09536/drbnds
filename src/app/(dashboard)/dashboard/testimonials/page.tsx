@@ -490,11 +490,15 @@ export default function TestimonialsPage() {
         }
     }
 
-    // Remove published testimonial
+    // Remove published testimonial — via API to bypass RLS
     const removeTestimonial = async (id: string) => {
         try {
-            const { error } = await supabase.from('testimonials').update({ is_active: false }).eq('id', id)
-            if (error) throw error
+            const res = await fetch('/api/testimonials/pending', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, action: 'remove' }),
+            })
+            if (!res.ok) throw new Error((await res.json()).error)
             toast.success("Removed from website")
             setPublished(prev => prev.filter(p => p.id !== id))
         } catch (error: any) {
