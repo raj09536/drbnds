@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AppointmentProvider } from "@/context/AppointmentContext";
+import { CartProvider } from "@/context/CartContext";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -35,9 +36,11 @@ export default function RootLayout({
       <body
         className={`${cormorant.variable} ${dmSans.variable} antialiased font-sans`}
       >
-        <AppointmentProvider>
-          {children}
-        </AppointmentProvider>
+        <CartProvider>
+          <AppointmentProvider>
+            {children}
+          </AppointmentProvider>
+        </CartProvider>
         <Toaster position="top-center" expand={false} richColors />
       </body>
     </html>

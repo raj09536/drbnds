@@ -4,6 +4,7 @@ import { Hero } from "@/components/Hero"
 import { AboutUs } from "@/components/sections/AboutUs"
 import { Specializations } from "@/components/sections/Specializations"
 import { Services } from "@/components/Services"
+import { ShopTeaser } from "@/components/sections/ShopTeaser"
 import { Doctors } from "@/components/DoctorSection"
 import { Testimonials } from "@/components/sections/Testimonials"
 import { CaseFiles } from '@/components/sections/CaseFiles'
@@ -24,6 +25,7 @@ export default function Home() {
       <AboutUs />
       <Specializations />
       <Services />
+      <ShopTeaser />
       <Doctors />
       <Testimonials />
       <CaseFiles />
