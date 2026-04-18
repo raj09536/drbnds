@@ -112,16 +112,37 @@ export function WorkingHours() {
                                         </span>
                                     )}
                                 </span>
-                                <span
-                                    style={{
-                                        fontFamily: "var(--font-dm-sans)",
-                                        fontSize: "clamp(12px, 2vw, 14px)",
-                                        fontWeight: 500,
-                                        color: row.closed ? "var(--rose)" : "white",
-                                    }}
-                                >
-                                    {row.time}
-                                </span>
+                                <div className="flex flex-wrap gap-2 justify-end">
+                                    {row.closed ? (
+                                        <span
+                                            className="rounded-full px-3 py-1"
+                                            style={{
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "12px",
+                                                fontWeight: 600,
+                                                background: "rgba(220,38,38,0.15)",
+                                                color: "#f87171",
+                                            }}
+                                        >
+                                            Closed
+                                        </span>
+                                    ) : (row.slots as string[]).map((slot, si) => (
+                                        <span
+                                            key={si}
+                                            className="rounded-full px-3 py-1"
+                                            style={{
+                                                fontFamily: "var(--font-dm-sans)",
+                                                fontSize: "clamp(11px, 1.8vw, 13px)",
+                                                fontWeight: 500,
+                                                background: "rgba(127,185,154,0.15)",
+                                                color: "white",
+                                                border: "1px solid rgba(127,185,154,0.3)",
+                                            }}
+                                        >
+                                            {slot}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         )
                     })}

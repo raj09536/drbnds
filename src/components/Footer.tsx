@@ -208,11 +208,18 @@ export function Footer() {
                                     {clinics[0].address}
                                 </span>
                             </div>
-                            <div className="flex items-center gap-2.5">
-                                <Phone className="w-3.5 h-3.5 shrink-0 opacity-60" />
-                                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
-                                    {clinics[0].phone}
-                                </span>
+                            <div className="flex items-start gap-2.5">
+                                <Phone className="w-3.5 h-3.5 mt-0.5 shrink-0 opacity-60" />
+                                <div className="flex flex-col gap-1">
+                                    <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
+                                        {clinics[0].phone}
+                                    </span>
+                                    {clinics[0].phone2 && (
+                                        <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
+                                            {clinics[0].phone2}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex items-center gap-2.5">
                                 <Mail className="w-3.5 h-3.5 shrink-0 opacity-60" />
@@ -254,11 +261,18 @@ export function Footer() {
                                     {clinics[1].address}
                                 </span>
                             </div>
-                            <div className="flex items-center gap-2.5">
-                                <Phone className="w-3.5 h-3.5 shrink-0 opacity-60" />
-                                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
-                                    {clinics[1].phone}
-                                </span>
+                            <div className="flex items-start gap-2.5">
+                                <Phone className="w-3.5 h-3.5 mt-0.5 shrink-0 opacity-60" />
+                                <div className="flex flex-col gap-1">
+                                    <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
+                                        {clinics[1].phone}
+                                    </span>
+                                    {clinics[1].phone2 && (
+                                        <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", color: "rgba(255,255,255,0.65)" }}>
+                                            {clinics[1].phone2}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex items-center gap-2.5">
                                 <Mail className="w-3.5 h-3.5 shrink-0 opacity-60" />

@@ -1,298 +1,318 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
+import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, Loader2, User, Mail, Lock, Phone, Key, ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowRight, Loader2, User, Mail, Lock, Phone, Key, ChevronLeft, Eye, EyeOff } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
 
-export default function SignupPage() {
+function PatientAuthPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const [mode, setMode] = useState<"login" | "signup">("login")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-
-    // OTP Flow States
+    const [showPassword, setShowPassword] = useState(false)
     const [isOtpSent, setIsOtpSent] = useState(false)
     const [email, setEmail] = useState("")
     const [otp, setOtp] = useState("")
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    useEffect(() => {
+        const m = searchParams.get("mode")
+        setMode(m === "signup" ? "signup" : "login")
+    }, [searchParams])
+
+    const switchMode = (m: "login" | "signup") => {
+        setMode(m)
+        setError(null)
+        setIsOtpSent(false)
+        setOtp("")
+    }
+
+    // ── LOGIN ──────────────────────────────────────────────────────
+    async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setLoading(true)
         setError(null)
-
-        const formData = new FormData(e.currentTarget)
-        const userEmail = (formData.get("email") as string).trim()
-        const password = formData.get("password") as string
-        const full_name = (formData.get("fullName") as string).trim()
-        const phone = (formData.get("phone") as string).trim()
-
-        const { data, error: authError } = await supabase.auth.signUp({
-            email: userEmail,
-            password,
-            options: {
-                data: {
-                    full_name,
-                    phone,
-                    role: 'patient', // Security fix: Hardcoded role
-                },
-            },
+        const fd = new FormData(e.currentTarget)
+        const { error: err } = await supabase.auth.signInWithPassword({
+            email: (fd.get("email") as string).trim(),
+            password: fd.get("password") as string,
         })
-
-        if (authError) {
-            console.error("Signup Error:", authError.message)
-            setError(authError.message)
+        if (err) {
+            setError(err.message)
             setLoading(false)
             return
         }
+        toast.success("Welcome back!")
+        router.push("/patient-dashboard")
+    }
 
+    // ── SIGNUP ─────────────────────────────────────────────────────
+    async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
+        const fd = new FormData(e.currentTarget)
+        const userEmail = (fd.get("email") as string).trim()
+        const { data, error: err } = await supabase.auth.signUp({
+            email: userEmail,
+            password: fd.get("password") as string,
+            options: {
+                data: {
+                    full_name: (fd.get("fullName") as string).trim(),
+                    phone: (fd.get("phone") as string).trim(),
+                    role: "patient",
+                },
+            },
+        })
+        if (err) { setError(err.message); setLoading(false); return }
         if (data.user) {
             setEmail(userEmail)
             setIsOtpSent(true)
-            toast.success("Verification code sent!", {
-                description: "Please check your email for the 6-digit code."
-            })
+            toast.success("Verification code sent! Check your email.")
         }
         setLoading(false)
     }
 
     async function handleVerifyOtp(e: React.FormEvent) {
         e.preventDefault()
-        if (otp.length !== 6) {
-            toast.error("Invalid Code", { description: "Please enter a valid 6-digit code." })
-            return
-        }
-
+        if (otp.length !== 6) { toast.error("Enter a valid 6-digit code."); return }
         setLoading(true)
-        setError(null)
-
-        const { data, error: verifyError } = await supabase.auth.verifyOtp({
-            email,
-            token: otp,
-            type: 'signup'
-        })
-
-        if (verifyError) {
-            setError(verifyError.message)
-            toast.error("Verification Failed", { description: verifyError.message })
-            setLoading(false)
-            return
-        }
-
+        const { data, error: err } = await supabase.auth.verifyOtp({ email, token: otp, type: "signup" })
+        if (err) { setError(err.message); setLoading(false); return }
         if (data.user) {
-            toast.success("Account Verified!", { description: "Welcome to Dr. BND&apos;s Clinic." })
+            toast.success("Account verified! Welcome.")
             router.push("/patient-dashboard")
         }
     }
 
+    const inputCls = "w-full pl-10 pr-4 py-3 rounded-xl border border-[#1a3a2a15] text-[14px] outline-none focus:border-[#1a3a2a40] focus:shadow-[0_0_0_3px_rgba(26,58,42,0.08)] transition-all bg-white"
+    const labelCls = "block text-[12px] font-semibold text-[#1a3a2a] mb-1.5"
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-soft-mint to-white p-6">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "var(--cream, #f5f0e8)" }}>
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.5 }}
                 className="w-full max-w-md"
             >
-                <Card className="border-deep-teal/10 shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden">
-                    <div className="h-2 bg-linear-to-r from-deep-teal via-accent-teal to-soft-mint" />
-                    <CardHeader className="space-y-2 text-center pb-2">
-                        <div className="flex justify-center mb-2">
-                            <motion.div
-                                initial={{ scale: 0.5, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                            >
-                                <Image
-                                    src="/logo.jpeg"
-                                    alt="Dr. BND Clinic"
-                                    width={180}
-                                    height={60}
-                                    className="object-contain"
-                                />
-                            </motion.div>
-                        </div>
-                        <CardTitle className="text-3xl font-bold text-deep-teal tracking-tight">
-                            {isOtpSent ? "Verify Email" : "Create Account"}
-                        </CardTitle>
-                        <CardDescription className="text-sage-green font-medium">
-                            {isOtpSent
-                                ? "We&apos;ve sent a 6-digit code to your email."
-                                : "Join Dr. BND&apos;s Clinic for specialized care."}
-                        </CardDescription>
-                    </CardHeader>
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-[#1a3a2a08]">
+                    {/* Top accent */}
+                    <div className="h-1.5" style={{ background: "linear-gradient(to right, #1a3a2a, #3d6b52, #7fb99a)" }} />
 
-                    <CardContent className="pt-4">
+                    {/* Header */}
+                    <div className="px-8 pt-8 pb-6 text-center">
+                        <div className="flex justify-center mb-4">
+                            <Image src="/logo.jpeg" alt="Dr. BND Clinic" width={90} height={90} className="object-contain rounded-xl" />
+                        </div>
+                        <h1 className="font-bold text-[#1a3a2a]" style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "28px" }}>
+                            {isOtpSent ? "Verify Email" : mode === "login" ? "Patient Login" : "Create Account"}
+                        </h1>
+                        <p className="text-[#1a3a2a60] text-[13px] mt-1" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                            {isOtpSent
+                                ? `We sent a 6-digit code to ${email}`
+                                : mode === "login"
+                                ? "Sign in to access your health records"
+                                : "Join Dr. BND's Clinic for personalised care"}
+                        </p>
+                    </div>
+
+                    {/* Form area */}
+                    <div className="px-8 pb-6" style={{ fontFamily: "var(--font-dm-sans)" }}>
                         <AnimatePresence mode="wait">
-                            {!isOtpSent ? (
+
+                            {/* ── LOGIN FORM ── */}
+                            {mode === "login" && !isOtpSent && (
                                 <motion.form
-                                    key="signup-form"
-                                    initial={{ opacity: 0, x: -20 }}
+                                    key="login"
+                                    initial={{ opacity: 0, x: -16 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    onSubmit={handleSubmit}
+                                    exit={{ opacity: 0, x: 16 }}
+                                    onSubmit={handleLogin}
                                     className="space-y-4"
                                 >
-                                    <div className="space-y-2">
-                                        <Label htmlFor="fullName" className="text-deep-teal font-medium ml-1">Full Name</Label>
+                                    <div>
+                                        <label className={labelCls}>Email Address</label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-green" />
-                                            <Input
-                                                id="fullName"
-                                                name="fullName"
-                                                placeholder="Enter your full name"
-                                                required
-                                                className="pl-10 h-11 border-deep-teal/10 bg-white/50 focus-visible:ring-deep-teal/20 transition-all rounded-xl"
-                                            />
+                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="email" type="email" required placeholder="name@example.com" className={inputCls} />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="phone" className="text-deep-teal font-medium ml-1">Phone Number</Label>
+                                    <div>
+                                        <label className={labelCls}>Password</label>
                                         <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-green" />
-                                            <Input
-                                                id="phone"
-                                                name="phone"
-                                                placeholder="+91 00000 00000"
-                                                required
-                                                className="pl-10 h-11 border-deep-teal/10 bg-white/50 focus-visible:ring-deep-teal/20 transition-all rounded-xl"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-deep-teal font-medium ml-1">Email Address</Label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-green" />
-                                            <Input
-                                                id="email"
-                                                name="email"
-                                                type="email"
-                                                placeholder="name@example.com"
-                                                required
-                                                className="pl-10 h-11 border-deep-teal/10 bg-white/50 focus-visible:ring-deep-teal/20 transition-all rounded-xl"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="password" className="text-deep-teal font-medium ml-1">Password</Label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-green" />
-                                            <Input
-                                                id="password"
-                                                name="password"
-                                                type="password"
-                                                placeholder="••••••••"
-                                                required
-                                                className="pl-10 h-11 border-deep-teal/10 bg-white/50 focus-visible:ring-deep-teal/20 transition-all rounded-xl"
-                                            />
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="password" type={showPassword ? "text" : "password"} required placeholder="••••••••" className={inputCls} style={{ paddingRight: "44px" }} />
+                                            <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a3a2a40] hover:text-[#1a3a2a] cursor-pointer">
+                                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            </button>
                                         </div>
                                     </div>
 
                                     {error && (
-                                        <p className="text-xs font-semibold text-destructive mt-2 bg-destructive/5 border border-destructive/10 p-3 rounded-xl text-center">
+                                        <p className="text-[12px] font-semibold text-red-600 bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl text-center">
                                             {error}
                                         </p>
                                     )}
 
-                                    <Button
+                                    <button
                                         type="submit"
-                                        className="w-full h-12 text-lg font-bold bg-deep-teal hover:bg-deep-teal/90 text-white shadow-lg shadow-deep-teal/20 group rounded-xl mt-4 cursor-pointer"
                                         disabled={loading}
+                                        className="w-full py-3.5 rounded-xl text-white font-bold text-[14px] flex items-center justify-center gap-2 cursor-pointer hover:brightness-110 transition-all disabled:opacity-60"
+                                        style={{ background: "var(--forest, #1a3a2a)" }}
                                     >
-                                        {loading ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <span className="flex items-center justify-center gap-2">
-                                                Complete Registration
-                                                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                                            </span>
-                                        )}
-                                    </Button>
+                                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Sign In <ArrowRight className="w-4 h-4" /></>}
+                                    </button>
                                 </motion.form>
-                            ) : (
+                            )}
+
+                            {/* ── SIGNUP FORM ── */}
+                            {mode === "signup" && !isOtpSent && (
                                 <motion.form
-                                    key="otp-form"
-                                    initial={{ opacity: 0, x: 20 }}
+                                    key="signup"
+                                    initial={{ opacity: 0, x: 16 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    onSubmit={handleVerifyOtp}
-                                    className="space-y-6"
+                                    exit={{ opacity: 0, x: -16 }}
+                                    onSubmit={handleSignup}
+                                    className="space-y-4"
                                 >
-                                    <div className="space-y-3">
-                                        <Label htmlFor="otp" className="text-deep-teal font-bold text-center block mb-2 tracking-widest uppercase text-xs">Enter 6-Digit Code</Label>
+                                    <div>
+                                        <label className={labelCls}>Full Name</label>
                                         <div className="relative">
-                                            <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent-teal" />
-                                            <Input
-                                                id="otp"
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="fullName" type="text" required placeholder="Enter your full name" className={inputCls} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={labelCls}>Phone Number</label>
+                                        <div className="relative">
+                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="phone" type="tel" required placeholder="+91 00000 00000" className={inputCls} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={labelCls}>Email Address</label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="email" type="email" required placeholder="name@example.com" className={inputCls} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={labelCls}>Password</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input name="password" type={showPassword ? "text" : "password"} required placeholder="••••••••" className={inputCls} style={{ paddingRight: "44px" }} />
+                                            <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a3a2a40] hover:text-[#1a3a2a] cursor-pointer">
+                                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {error && (
+                                        <p className="text-[12px] font-semibold text-red-600 bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl text-center">
+                                            {error}
+                                        </p>
+                                    )}
+
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full py-3.5 rounded-xl text-white font-bold text-[14px] flex items-center justify-center gap-2 cursor-pointer hover:brightness-110 transition-all disabled:opacity-60"
+                                        style={{ background: "var(--forest, #1a3a2a)" }}
+                                    >
+                                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Create Account <ArrowRight className="w-4 h-4" /></>}
+                                    </button>
+                                </motion.form>
+                            )}
+
+                            {/* ── OTP FORM ── */}
+                            {isOtpSent && (
+                                <motion.form
+                                    key="otp"
+                                    initial={{ opacity: 0, x: 16 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -16 }}
+                                    onSubmit={handleVerifyOtp}
+                                    className="space-y-4"
+                                >
+                                    <div>
+                                        <label className={labelCls + " text-center block"}>Enter 6-Digit Code</label>
+                                        <div className="relative">
+                                            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a3a2a40]" />
+                                            <input
                                                 type="text"
                                                 maxLength={6}
                                                 placeholder="000000"
                                                 value={otp}
-                                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                                                className="pl-12 h-14 text-2xl tracking-[0.5em] font-black text-center border-2 border-deep-teal/10 bg-soft-mint/10 focus-visible:ring-deep-teal focus-visible:border-deep-teal rounded-2xl"
+                                                onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
+                                                className="w-full pl-10 pr-4 py-4 rounded-xl border-2 border-[#1a3a2a20] text-2xl tracking-[0.5em] font-black text-center outline-none focus:border-[#1a3a2a50] bg-white"
                                                 required
                                             />
                                         </div>
-                                        <p className="text-center text-sm text-cool-grey font-medium">
-                                            Waiting for code at <span className="text-deep-teal font-bold">{email}</span>
-                                        </p>
                                     </div>
 
                                     {error && (
-                                        <p className="text-xs font-semibold text-destructive bg-destructive/5 border border-destructive/10 p-3 rounded-xl text-center">
+                                        <p className="text-[12px] font-semibold text-red-600 bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl text-center">
                                             {error}
                                         </p>
                                     )}
 
-                                    <div className="space-y-3">
-                                        <Button
-                                            type="submit"
-                                            className="w-full h-14 text-lg font-black bg-deep-teal hover:bg-deep-teal/90 text-white shadow-xl shadow-deep-teal/20 rounded-2xl cursor-pointer"
-                                            disabled={loading}
-                                        >
-                                            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Verify & Complete"}
-                                        </Button>
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full py-3.5 rounded-xl text-white font-bold text-[14px] flex items-center justify-center gap-2 cursor-pointer hover:brightness-110 transition-all disabled:opacity-60"
+                                        style={{ background: "var(--forest, #1a3a2a)" }}
+                                    >
+                                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Continue"}
+                                    </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsOtpSent(false)}
-                                            className="w-full flex items-center justify-center gap-2 text-sage-green hover:text-deep-teal font-bold transition-colors py-2 text-sm cursor-pointer"
-                                        >
-                                            <ChevronLeft className="w-4 h-4" />
-                                            Back to Sign Up
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsOtpSent(false)}
+                                        className="w-full flex items-center justify-center gap-1 text-[#1a3a2a60] hover:text-[#1a3a2a] text-[13px] font-semibold py-2 cursor-pointer transition-colors"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" /> Back to Sign Up
+                                    </button>
                                 </motion.form>
                             )}
-                        </AnimatePresence>
-                    </CardContent>
 
-                    <CardFooter className="flex flex-col space-y-4 border-t border-deep-teal/5 bg-soft-mint/10 py-6">
-                        {!isOtpSent && (
-                            <p className="text-sm text-center text-sage-green">
-                                Already have an account?{" "}
-                                <Link
-                                    href="/login"
-                                    className="text-deep-teal font-bold hover:underline underline-offset-4"
-                                >
-                                    Sign in here
-                                </Link>
-                            </p>
-                        )}
-                        {isOtpSent && (
-                            <p className="text-xs text-center text-sage-green/60 px-6">
-                                Didn&apos;t receive the code? Please check your spam folder or wait a few minutes before trying again.
-                            </p>
-                        )}
-                    </CardFooter>
-                </Card>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Footer toggle */}
+                    {!isOtpSent && (
+                        <div className="px-8 py-5 border-t border-[#1a3a2a08] bg-[#1a3a2a04] text-center" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                            {mode === "login" ? (
+                                <p className="text-[13px] text-[#1a3a2a80]">
+                                    Don&apos;t have an account?{" "}
+                                    <button onClick={() => switchMode("signup")} className="text-[#1a3a2a] font-bold hover:underline cursor-pointer bg-transparent border-none">
+                                        Create one here
+                                    </button>
+                                </p>
+                            ) : (
+                                <p className="text-[13px] text-[#1a3a2a80]">
+                                    Already have an account?{" "}
+                                    <button onClick={() => switchMode("login")} className="text-[#1a3a2a] font-bold hover:underline cursor-pointer bg-transparent border-none">
+                                        Sign in here
+                                    </button>
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
             </motion.div>
         </div>
+    )
+}
+
+export default function SignupPageWrapper() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: "var(--cream)" }}><div className="w-8 h-8 rounded-full border-2 border-[#1a3a2a] border-t-transparent animate-spin" /></div>}>
+            <PatientAuthPage />
+        </Suspense>
     )
 }

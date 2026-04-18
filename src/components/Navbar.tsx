@@ -4,7 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Menu, X, Calendar, ArrowRight, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react"
+import { Menu, X, Calendar, ArrowRight, ShoppingCart, Minus, Plus, Trash2, UserCircle } from "lucide-react"
 import { useAppointment } from "@/context/AppointmentContext"
 import { useCart } from "@/context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
@@ -23,7 +23,7 @@ export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
     const [scrolled, setScrolled] = React.useState(false)
     const { openModal } = useAppointment()
-    const { items, totalItems, totalPrice, removeFromCart, updateQuantity, isCartOpen, setCartOpen } = useCart()
+    const { items, cartCount, cartTotal, removeFromCart, updateQuantity, isCartOpen, setCartOpen } = useCart()
     const router = useRouter()
     const pathname = usePathname()
 
@@ -130,6 +130,14 @@ export function Navbar() {
                     {/* Desktop CTA */}
                     <div className="hidden md:flex items-center gap-3">
                         <Link
+                            href="/signup?mode=login"
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#1a3a2a20] text-forest text-[13px] font-semibold hover:bg-[#1a3a2a08] transition-colors"
+                            style={{ fontFamily: "var(--font-dm-sans)" }}
+                        >
+                            <UserCircle className="w-4 h-4" />
+                            Patient Login
+                        </Link>
+                        <Link
                             href="/login"
                             className="text-forest/60 text-xs font-semibold flex items-center gap-1 uppercase tracking-widest hover:text-forest transition-colors"
                         >
@@ -143,9 +151,9 @@ export function Navbar() {
                             aria-label="Open cart"
                         >
                             <ShoppingCart className="w-5 h-5" />
-                            {totalItems > 0 && (
+                            {cartCount > 0 && (
                                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#c9a84c] text-white text-[9px] font-bold flex items-center justify-center">
-                                    {totalItems > 9 ? '9+' : totalItems}
+                                    {cartCount > 9 ? '9+' : cartCount}
                                 </span>
                             )}
                         </button>
@@ -168,9 +176,9 @@ export function Navbar() {
                             aria-label="Open cart"
                         >
                             <ShoppingCart className="w-6 h-6" />
-                            {totalItems > 0 && (
+                            {cartCount > 0 && (
                                 <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#c9a84c] text-white text-[9px] font-bold flex items-center justify-center">
-                                    {totalItems > 9 ? '9+' : totalItems}
+                                    {cartCount > 9 ? '9+' : cartCount}
                                 </span>
                             )}
                         </button>
@@ -254,15 +262,26 @@ export function Navbar() {
                                         <Calendar className="w-5 h-5" />
                                         Book Appointment
                                     </button>
-                                    <div className="mt-8 flex justify-between items-center px-2">
+                                    <div className="mt-4 flex flex-col gap-3">
                                         <Link
-                                            href="/login"
+                                            href="/signup?mode=login"
                                             onClick={() => setIsOpen(false)}
-                                            className="text-forest/60 text-sm font-semibold flex items-center gap-1 uppercase tracking-widest hover:text-forest transition-colors"
+                                            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-[#1a3a2a25] text-forest font-semibold text-[14px] hover:bg-[#1a3a2a08] transition-colors"
+                                            style={{ fontFamily: "var(--font-dm-sans)" }}
                                         >
-                                            Staff Login <ArrowRight className="w-3 h-3" />
+                                            <UserCircle className="w-4 h-4" />
+                                            Patient Login
                                         </Link>
-                                        <p className="text-gray-400 text-xs">Dr. BND Klinik © 2024</p>
+                                        <div className="flex justify-between items-center px-2">
+                                            <Link
+                                                href="/login"
+                                                onClick={() => setIsOpen(false)}
+                                                className="text-forest/60 text-sm font-semibold flex items-center gap-1 uppercase tracking-widest hover:text-forest transition-colors"
+                                            >
+                                                Staff Login <ArrowRight className="w-3 h-3" />
+                                            </Link>
+                                            <p className="text-gray-400 text-xs">Dr. BND&apos;s Clinic © 2026</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -303,12 +322,12 @@ export function Navbar() {
                                 >
                                     <ShoppingCart size={18} />
                                     Your Cart
-                                    {totalItems > 0 && (
+                                    {cartCount > 0 && (
                                         <span
                                             className="px-2 py-0.5 bg-[#1a3a2a10] text-[#1a3a2a] rounded-full text-[12px] font-bold"
                                             style={{ fontFamily: "var(--font-dm-sans)" }}
                                         >
-                                            {totalItems}
+                                            {cartCount}
                                         </span>
                                     )}
                                 </h2>
@@ -419,22 +438,23 @@ export function Navbar() {
                                             className="text-[#1a3a2a] font-bold text-[18px]"
                                             style={{ fontFamily: "var(--font-dm-sans)" }}
                                         >
-                                            ₹{totalPrice}
+                                            ₹{cartTotal}
                                         </span>
                                     </div>
                                     <button
-                                        onClick={() => toast.info("Online checkout coming soon! Call us to order.", { duration: 4000 })}
+                                        onClick={() => { setCartOpen(false); router.push('/checkout') }}
                                         className="w-full py-3.5 rounded-2xl bg-[#1a3a2a] text-white font-bold text-[14px] cursor-pointer hover:brightness-110 transition-all"
                                         style={{ fontFamily: "var(--font-dm-sans)" }}
                                     >
-                                        Proceed to Checkout
+                                        Proceed to Checkout — ₹{cartTotal}
                                     </button>
-                                    <p
-                                        className="text-center text-[11px] text-[#1a3a2a40] mt-3"
+                                    <button
+                                        onClick={() => { setCartOpen(false); router.push('/shop') }}
+                                        className="w-full py-2.5 mt-2 rounded-2xl border border-[#1a3a2a20] text-[#1a3a2a] font-semibold text-[13px] cursor-pointer hover:bg-[#1a3a2a08] transition-all"
                                         style={{ fontFamily: "var(--font-dm-sans)" }}
                                     >
-                                        Online ordering coming soon
-                                    </p>
+                                        Continue Shopping
+                                    </button>
                                 </div>
                             )}
                         </motion.div>

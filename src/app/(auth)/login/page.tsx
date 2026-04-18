@@ -78,8 +78,9 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
     const doctors = [
-        { id: 1, name: "Dr. B. N. Dwivedy", image: "/doctor.jpeg", specialization: "MD (Homeopathy)" },
-        { id: 2, name: "Dr. Himanshu Bhandari", image: "/second_doctor.jpeg", specialization: "B.H.M.S (H.P.U)" }
+        { id: 1, name: "Dr. B. N. Dwivedy", image: "/doctor.jpeg" as string | null, specialization: "MD (Homeopathy)" },
+        { id: 2, name: "Dr. Himanshu Bhandari", image: "/second_doctor.jpeg" as string | null, specialization: "B.H.M.S (H.P.U)" },
+        { id: 3, name: "Amit Kumar", image: "/amit-kumar.jpg" as string | null, specialization: "Pharmacist" },
     ]
 
     const handleLogin = async () => {
@@ -87,17 +88,36 @@ export default function LoginPage() {
         setLoading(true)
         setErrors({})
 
+        // Pharmacist login via API route
+        if (selectedDoctor === 3) {
+            try {
+                const res = await fetch('/api/pharmacist/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'amit', password }),
+                })
+                if (!res.ok) {
+                    setErrors({ password: 'Invalid credentials. Please try again.' })
+                    setLoading(false)
+                    return
+                }
+                const data = await res.json()
+                localStorage.setItem('pharmacist_session', JSON.stringify(data))
+                router.push('/pharmacy/dashboard/overview')
+            } catch {
+                setErrors({ password: 'Something went wrong. Please try again.' })
+                setLoading(false)
+            }
+            return
+        }
+
         const { data, error } = await supabase
             .rpc('verify_doctor_login', {
                 p_doctor_id: selectedDoctor,
                 p_password: password,
             })
 
-        console.log('RPC data:', data)
-        console.log('RPC error:', error)
-
         if (error) {
-            console.log('Error details:', error)
             setErrors({ password: 'Something went wrong. Please try again.' })
             setLoading(false)
             return
@@ -105,9 +125,6 @@ export default function LoginPage() {
 
         // data is an ARRAY — first row
         const result = Array.isArray(data) ? data[0] : data
-
-        console.log('Result:', result)
-        console.log('Success value:', result?.success)
 
         if (!result || result.success === false || result.success === 'false') {
             setErrors({ password: 'Invalid password. Please try again.' })
@@ -202,10 +219,10 @@ export default function LoginPage() {
                                     </div>
                                 </div>
 
-                                {/* Doctor Selection */}
+                                {/* Staff Selection */}
                                 <div style={{ marginBottom: "24px" }}>
-                                    <label style={labelStyle}>Select Doctor</label>
-                                    <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
+                                    <label style={labelStyle}>Select Staff Member</label>
+                                    <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
                                         {doctors.map((doc) => (
                                             <button
                                                 key={doc.id}
@@ -214,7 +231,7 @@ export default function LoginPage() {
                                                     background: "white",
                                                     border: selectedDoctor === doc.id ? "2px solid var(--forest)" : "1.5px solid rgba(0,0,0,0.08)",
                                                     borderRadius: "12px",
-                                                    padding: "12px",
+                                                    padding: "12px 8px",
                                                     textAlign: "center",
                                                     cursor: "pointer",
                                                     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -227,12 +244,16 @@ export default function LoginPage() {
                                                     minWidth: "0"
                                                 }}
                                             >
-                                                <div style={{ width: "48px", height: "48px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 8px", border: "1.5px solid var(--cream)", flexShrink: 0 }}>
-                                                    <img src={doc.image} alt={doc.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                <div style={{ width: "48px", height: "48px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 8px", border: "1.5px solid var(--cream)", flexShrink: 0, background: doc.image ? undefined : "var(--forest)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                                    {doc.image ? (
+                                                        <img src={doc.image} alt={doc.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                    ) : (
+                                                        <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "16px", fontWeight: 700, color: "white" }}>AK</span>
+                                                    )}
                                                 </div>
                                                 <p style={{
                                                     fontFamily: "var(--font-dm-sans)",
-                                                    fontSize: doc.name === "Dr. B. N. Dwivedy" ? "11px" : "12px",
+                                                    fontSize: "11px",
                                                     fontWeight: 600,
                                                     color: "var(--charcoal)",
                                                     lineHeight: 1.2,
@@ -326,9 +347,9 @@ export default function LoginPage() {
                                     Please select your profile. We will send a secure reset link to the clinic administrator email: <strong style={{ color: "var(--forest)" }}>drbndclinic@gmail.com</strong>
                                 </p>
 
-                                {/* Doctor Selection (Forgot Mode) */}
+                                {/* Staff Selection (Forgot Mode) */}
                                 <div style={{ marginBottom: "32px" }}>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-3 gap-3">
                                         {doctors.map((doc) => (
                                             <button
                                                 key={doc.id}
@@ -337,16 +358,20 @@ export default function LoginPage() {
                                                     background: "white",
                                                     border: selectedDoctor === doc.id ? "2px solid var(--forest)" : "1.5px solid rgba(0,0,0,0.08)",
                                                     borderRadius: "12px",
-                                                    padding: "12px",
+                                                    padding: "12px 8px",
                                                     textAlign: "center",
                                                     cursor: "pointer",
                                                     transition: "all 0.2s"
                                                 }}
                                             >
-                                                <div style={{ width: "40px", height: "40px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 8px" }}>
-                                                    <img src={doc.image} alt={doc.image} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                <div style={{ width: "40px", height: "40px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 8px", background: doc.image ? undefined : "var(--forest)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                                    {doc.image ? (
+                                                        <img src={doc.image} alt={doc.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                    ) : (
+                                                        <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px", fontWeight: 700, color: "white" }}>AK</span>
+                                                    )}
                                                 </div>
-                                                <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", fontWeight: 600, color: "var(--charcoal)" }}>{doc.name.split(' ').slice(0, 2).join(' ')}</p>
+                                                <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", fontWeight: 600, color: "var(--charcoal)" }}>{doc.name.split(' ').slice(0, 2).join(' ')}</p>
                                             </button>
                                         ))}
                                     </div>

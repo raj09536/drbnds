@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { Star, ShoppingCart, BadgeCheck } from "lucide-react"
-import { Product } from "@/data/productsData"
+import { Product } from "@/types/product"
 import { useCart } from "@/context/CartContext"
 import { toast } from "sonner"
 
@@ -12,8 +12,8 @@ export function ProductCard({ product }: { product: Product }) {
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.stopPropagation()
-        if (!product.inStock) return
-        addToCart(product)
+        if (!product.in_stock) return
+        addToCart(product, 1)
         toast.success(`${product.name} added to cart`)
     }
 
@@ -25,17 +25,17 @@ export function ProductCard({ product }: { product: Product }) {
             {/* Image */}
             <div className="relative overflow-hidden bg-[#f5f0e8] aspect-square">
                 <img
-                    src={product.image}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {product.isBestseller && (
+                {product.is_best_seller && (
                     <span className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 bg-[#c9a84c] text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow">
                         <BadgeCheck size={10} />
                         Bestseller
                     </span>
                 )}
-                {!product.inStock && (
+                {!product.in_stock && (
                     <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                         <span className="px-3 py-1.5 bg-white text-[#1a3a2a] text-[11px] font-bold uppercase tracking-widest rounded-full border border-[#1a3a2a20]">
                             Out of Stock
@@ -46,7 +46,6 @@ export function ProductCard({ product }: { product: Product }) {
 
             {/* Content */}
             <div className="flex flex-col flex-1 p-4 md:p-5">
-                {/* Category */}
                 <span
                     className="text-[10px] font-bold uppercase tracking-[2px] text-[#7fb99a] mb-2"
                     style={{ fontFamily: "var(--font-dm-sans)" }}
@@ -54,7 +53,6 @@ export function ProductCard({ product }: { product: Product }) {
                     {product.category}
                 </span>
 
-                {/* Name */}
                 <h3
                     className="font-semibold text-[#1a3a2a] leading-snug mb-1"
                     style={{
@@ -65,30 +63,12 @@ export function ProductCard({ product }: { product: Product }) {
                     {product.name}
                 </h3>
 
-                {/* Tagline */}
                 <p
-                    className="text-[#1a3a2a80] text-[12px] leading-relaxed mb-3 flex-1"
+                    className="text-[#1a3a2a80] text-[12px] leading-relaxed mb-3 flex-1 line-clamp-2"
                     style={{ fontFamily: "var(--font-dm-sans)" }}
                 >
-                    {product.tagline}
+                    {product.brand}{product.weight ? ` · ${product.weight}` : ""}
                 </p>
-
-                {/* Rating */}
-                <div className="flex items-center gap-1.5 mb-3">
-                    <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                            <Star
-                                key={i}
-                                size={11}
-                                fill={i < Math.round(product.rating) ? "var(--gold, #c9a84c)" : "transparent"}
-                                stroke={i < Math.round(product.rating) ? "var(--gold, #c9a84c)" : "rgba(0,0,0,0.2)"}
-                            />
-                        ))}
-                    </div>
-                    <span className="text-[11px] text-[#1a3a2a60]" style={{ fontFamily: "var(--font-dm-sans)" }}>
-                        ({product.reviewCount})
-                    </span>
-                </div>
 
                 {/* Price + CTA */}
                 <div className="flex items-center justify-between gap-2 mt-auto">
@@ -99,28 +79,42 @@ export function ProductCard({ product }: { product: Product }) {
                         >
                             ₹{product.price}
                         </span>
-                        {product.originalPrice && (
+                        {product.original_price && (
                             <span
                                 className="ml-1.5 line-through text-[#1a3a2a40]"
                                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: "13px" }}
                             >
-                                ₹{product.originalPrice}
+                                ₹{product.original_price}
                             </span>
                         )}
                     </div>
                     <button
                         onClick={handleAddToCart}
-                        disabled={!product.inStock}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-bold transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                        style={{
-                            fontFamily: "var(--font-dm-sans)",
-                            background: "var(--forest, #1a3a2a)",
-                            color: "white",
-                        }}
+                        disabled={!product.in_stock}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-bold transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-[#1a3a2a] text-white"
+                        style={{ fontFamily: "var(--font-dm-sans)" }}
                     >
                         <ShoppingCart size={13} />
                         Add
                     </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export function ProductCardSkeleton() {
+    return (
+        <div className="bg-white rounded-2xl overflow-hidden border border-[#2D501610] animate-pulse">
+            <div className="bg-[#f5f0e8] aspect-square" />
+            <div className="p-4 md:p-5 space-y-3">
+                <div className="h-2.5 bg-gray-100 rounded w-1/3" />
+                <div className="h-5 bg-gray-100 rounded w-2/3" />
+                <div className="h-2.5 bg-gray-100 rounded w-full" />
+                <div className="h-2.5 bg-gray-100 rounded w-4/5" />
+                <div className="flex justify-between items-center pt-1">
+                    <div className="h-5 bg-gray-100 rounded w-16" />
+                    <div className="h-8 w-16 bg-gray-100 rounded-full" />
                 </div>
             </div>
         </div>

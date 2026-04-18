@@ -290,8 +290,8 @@ export function ContactForm() {
                                         style={{ ...inputStyle, appearance: "auto" }}
                                     >
                                         <option value="">Choose a clinic...</option>
-                                        <option value="clinic1">Clinic 1 — Dehradun (Dr. B. N. Dwivedy)</option>
-                                        <option value="clinic2">Clinic 2 — Bijnor (Dr. Himanshu Bhandari)</option>
+                                        <option value="clinic1">Clinic 1 — Dehradun (Dr. B. N. Dwivedy & Dr. Himanshu Bhandari)</option>
+                                        <option value="clinic2">Clinic 2 — Bijnor/Dhampur (Dr. B. N. Dwivedy)</option>
                                     </select>
                                 </div>
 

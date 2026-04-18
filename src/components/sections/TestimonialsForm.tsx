@@ -489,9 +489,6 @@ export function TestimonialsForm() {
                                 {loading ? "Submitting..." : "Submit Testimonial →"}
                             </button>
 
-                            <p className="text-center mt-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--muted)" }}>
-                                🔒 Your testimonial will be reviewed before being published.
-                            </p>
                         </form>
                     )}
                 </div>
