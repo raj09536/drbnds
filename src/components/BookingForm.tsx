@@ -15,7 +15,6 @@ import {
     XCircle
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
@@ -33,7 +32,6 @@ const TIME_SLOTS = [
 ]
 
 export function BookingForm({ onSuccess, onClose }: BookingFormProps) {
-    useAuth()
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [doctorId, setDoctorId] = useState<string | null>(null)
