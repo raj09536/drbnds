@@ -17,8 +17,9 @@ export function ShopTeaser() {
             const { data } = await supabase
                 .from('products')
                 .select('*')
-                .eq('is_best_seller', true)
                 .eq('in_stock', true)
+                .order('is_best_seller', { ascending: false })
+                .order('created_at', { ascending: false })
                 .limit(4)
             setFetched(data || [])
             setLoading(false)
@@ -28,7 +29,7 @@ export function ShopTeaser() {
 
     const products = fetched.length > 0
         ? fetched
-        : staticProducts.filter(p => p.is_best_seller && p.in_stock).slice(0, 4)
+        : staticProducts.filter(p => p.in_stock).slice(0, 4)
 
     if (!loading && products.length === 0) return null
 

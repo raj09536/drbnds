@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Phone, Video, Building2, ArrowRight, Calendar, MapPin, Pill, Star } from "lucide-react"
+import Link from "next/link"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
-import { useAppointment } from "@/context/AppointmentContext"
 import { doctors as staticDoctors } from "@/data/staticData"
 import { supabase } from "@/lib/supabase"
 
@@ -126,13 +126,13 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
 
                 {!member.isPharmacist ? (
                     <div className="mt-8 flex flex-wrap items-center gap-4">
-                        <button
-                            onClick={() => openModal(member.id)}
-                            className="px-8 py-3 bg-forest text-white rounded-full font-bold text-[14px] shadow-sm hover:brightness-110 transition-all cursor-pointer flex items-center gap-2"
+                        <Link
+                            href="/appointment"
+                            className="px-8 py-3 bg-forest text-white rounded-full font-bold text-[14px] shadow-sm hover:brightness-110 transition-all flex items-center gap-2"
                         >
                             Book Consultation
                             <ArrowRight size={16} className="inline ml-1" />
-                        </button>
+                        </Link>
                         <div className="flex gap-2">
                              <a href={`tel:${member.phone}`} className="w-12 h-12 lg:w-10 lg:h-10 rounded-full border border-gray-100 flex items-center justify-center text-forest hover:bg-forest hover:text-white transition-all">
                                 <Phone size={16} />
@@ -155,7 +155,6 @@ function TeamMemberCard({ member, idx, isVisible, isReversed, openModal }: any) 
 
 export function Doctors() {
     const { ref, isVisible } = useScrollReveal(0.1)
-    const { openModal } = useAppointment()
     const [teamMembers, setTeamMembers] = useState<any[]>([])
 
     useEffect(() => {
@@ -231,13 +230,13 @@ export function Doctors() {
 
                 <div className="flex flex-col">
                     {teamMembers.map((member, idx) => (
-                        <TeamMemberCard 
-                            key={member.id} 
-                            member={member} 
-                            idx={idx} 
-                            isVisible={isVisible} 
+                        <TeamMemberCard
+                            key={member.id}
+                            member={member}
+                            idx={idx}
+                            isVisible={isVisible}
                             isReversed={idx % 2 !== 0}
-                            openModal={openModal}
+                            openModal={() => {}}
                         />
                     ))}
                 </div>

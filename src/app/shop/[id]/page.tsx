@@ -2,6 +2,7 @@
 
 import { use, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { ArrowLeft, ShoppingCart, Minus, Plus, CheckCircle, Package, Droplets } from "lucide-react"
 import { TopBar } from "@/components/layout/TopBar"
 import { Navbar } from "@/components/Navbar"
@@ -10,14 +11,12 @@ import { ProductCard, ProductCardSkeleton } from "@/components/sections/ProductC
 import { supabase } from "@/lib/supabase"
 import { Product } from "@/types/product"
 import { useCart } from "@/context/CartContext"
-import { useAppointment } from "@/context/AppointmentContext"
 import { toast } from "sonner"
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
     const router = useRouter()
     const { addToCart } = useCart()
-    const { openModal } = useAppointment()
     const [product, setProduct] = useState<Product | null>(null)
     const [related, setRelated] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
@@ -172,9 +171,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                             <div className="px-5 py-3 bg-[#1a3a2a08] rounded-2xl text-[14px] text-[#1a3a2a60] font-medium" style={{ fontFamily: "var(--font-dm-sans)" }}>Currently out of stock</div>
                         )}
 
-                        <button onClick={() => openModal()} className="mt-4 w-full py-3 rounded-full border-2 border-[#1a3a2a] text-[#1a3a2a] font-bold text-[14px] hover:bg-[#1a3a2a] hover:text-white transition-all cursor-pointer" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                        <Link href="/appointment" className="mt-4 w-full py-3 rounded-full border-2 border-[#1a3a2a] text-[#1a3a2a] font-bold text-[14px] hover:bg-[#1a3a2a] hover:text-white transition-all flex items-center justify-center" style={{ fontFamily: "var(--font-dm-sans)" }}>
                             Book a Consultation Instead
-                        </button>
+                        </Link>
                     </div>
                 </div>
 

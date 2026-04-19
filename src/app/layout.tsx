@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { AppointmentProvider } from "@/context/AppointmentContext";
 import { CartProvider } from "@/context/CartContext";
 
 const cormorant = Cormorant_Garamond({
@@ -37,9 +36,7 @@ export default function RootLayout({
         className={`${cormorant.variable} ${dmSans.variable} antialiased font-sans`}
       >
         <CartProvider>
-          <AppointmentProvider>
-            {children}
-          </AppointmentProvider>
+          {children}
         </CartProvider>
         <Toaster position="top-center" expand={false} richColors />
       </body>

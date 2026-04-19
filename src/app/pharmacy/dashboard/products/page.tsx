@@ -102,6 +102,8 @@ export default function ProductsPage() {
     }
 
     const handleDelete = async (id: string) => {
+        // Remove order_items referencing this product first, then delete the product
+        await supabase.from('order_items').delete().eq('product_id', id)
         const { error } = await supabase.from('products').delete().eq('id', id)
         if (error) { toast.error(error.message); return }
         setProducts(prev => prev.filter(p => p.id !== id))

@@ -15,11 +15,8 @@ import {
     ArrowRight
 } from "lucide-react"
 import Link from "next/link"
-import { useAuth } from "@/hooks/use-auth"
-import { AppointmentModal } from "@/components/AppointmentModal"
 
 export default function HomoeopathyPage() {
-    const { user } = useAuth()
 
     const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
@@ -176,28 +173,12 @@ export default function HomoeopathyPage() {
                             designed for your unique constitution.
                         </p>
 
-                        {user ? (
-                            <Link href="/patient-dashboard">
-                                <Button size="lg" className="bg-white text-deep-teal hover:bg-white/90 h-16 px-12 rounded-2xl text-xl font-bold group">
-                                    Go to Dashboard
-                                    <ArrowRight className="w-6 h-6 ml-2 transition-transform group-hover:translate-x-1" />
-                                </Button>
-                            </Link>
-                        ) : (
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <AppointmentModal>
-                                    <Button size="lg" className="bg-white text-deep-teal hover:bg-white/90 h-16 px-12 rounded-2xl text-xl font-bold group">
-                                        Book Now
-                                        <ArrowRight className="w-6 h-6 ml-2 transition-transform group-hover:translate-x-1" />
-                                    </Button>
-                                </AppointmentModal>
-                                <Link href="/login">
-                                    <Button size="lg" variant="outline" className="border-white/20 hover:bg-white/10 h-16 px-12 rounded-2xl text-xl font-bold">
-                                        Sign In
-                                    </Button>
-                                </Link>
-                            </div>
-                        )}
+                        <Link href="/appointment">
+                            <Button size="lg" className="bg-white text-deep-teal hover:bg-white/90 h-16 px-12 rounded-2xl text-xl font-bold group">
+                                Book Now
+                                <ArrowRight className="w-6 h-6 ml-2 transition-transform group-hover:translate-x-1" />
+                            </Button>
+                        </Link>
                     </motion.div>
                 </div>
             </section>

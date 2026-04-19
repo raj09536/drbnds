@@ -4,8 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Menu, X, Calendar, ArrowRight, ShoppingCart, Minus, Plus, Trash2, UserCircle } from "lucide-react"
-import { useAppointment } from "@/context/AppointmentContext"
+import { Menu, X, Calendar, ArrowRight, ShoppingCart, Minus, Plus, Trash2 } from "lucide-react"
 import { useCart } from "@/context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
@@ -22,7 +21,6 @@ const navItems = [
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
     const [scrolled, setScrolled] = React.useState(false)
-    const { openModal } = useAppointment()
     const { items, cartCount, cartTotal, removeFromCart, updateQuantity, isCartOpen, setCartOpen } = useCart()
     const router = useRouter()
     const pathname = usePathname()
@@ -130,14 +128,6 @@ export function Navbar() {
                     {/* Desktop CTA */}
                     <div className="hidden md:flex items-center gap-3">
                         <Link
-                            href="/signup?mode=login"
-                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#1a3a2a20] text-forest text-[13px] font-semibold hover:bg-[#1a3a2a08] transition-colors"
-                            style={{ fontFamily: "var(--font-dm-sans)" }}
-                        >
-                            <UserCircle className="w-4 h-4" />
-                            Patient Login
-                        </Link>
-                        <Link
                             href="/login"
                             className="text-forest/60 text-xs font-semibold flex items-center gap-1 uppercase tracking-widest hover:text-forest transition-colors"
                         >
@@ -158,14 +148,14 @@ export function Navbar() {
                             )}
                         </button>
 
-                        <button
-                            onClick={() => openModal()}
-                            className="flex items-center gap-2 bg-forest text-white rounded-lg hover:bg-sage transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                            style={{ padding: "10px 22px", fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 600, border: "none" }}
+                        <Link
+                            href="/appointment"
+                            className="flex items-center gap-2 bg-forest text-white rounded-lg hover:bg-sage transition-all duration-200 shadow-sm hover:shadow-md"
+                            style={{ padding: "10px 22px", fontFamily: "var(--font-dm-sans)", fontSize: "14px", fontWeight: 600 }}
                         >
                             <Calendar className="w-4 h-4" />
                             Book Appointment
-                        </button>
+                        </Link>
                     </div>
 
                     {/* Mobile right area: cart + menu toggle */}
@@ -254,24 +244,16 @@ export function Navbar() {
 
                                 {/* Mobile Footer Area */}
                                 <div className="px-6 py-8 border-t border-gold-light/20 bg-cream/30">
-                                    <button
-                                        onClick={() => { openModal(); setIsOpen(false); }}
-                                        className="w-full flex items-center justify-center gap-3 bg-forest text-white py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg font-bold cursor-pointer"
-                                        style={{ fontFamily: "var(--font-dm-sans)", border: "none" }}
+                                    <Link
+                                        href="/appointment"
+                                        onClick={() => setIsOpen(false)}
+                                        className="w-full flex items-center justify-center gap-3 bg-forest text-white py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg font-bold"
+                                        style={{ fontFamily: "var(--font-dm-sans)" }}
                                     >
                                         <Calendar className="w-5 h-5" />
                                         Book Appointment
-                                    </button>
+                                    </Link>
                                     <div className="mt-4 flex flex-col gap-3">
-                                        <Link
-                                            href="/signup?mode=login"
-                                            onClick={() => setIsOpen(false)}
-                                            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-[#1a3a2a25] text-forest font-semibold text-[14px] hover:bg-[#1a3a2a08] transition-colors"
-                                            style={{ fontFamily: "var(--font-dm-sans)" }}
-                                        >
-                                            <UserCircle className="w-4 h-4" />
-                                            Patient Login
-                                        </Link>
                                         <div className="flex justify-between items-center px-2">
                                             <Link
                                                 href="/login"

@@ -1,11 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { Phone, Mail, ArrowRight } from "lucide-react"
-import { useAppointment } from "@/context/AppointmentContext"
 
 export function TopBar() {
-    const { openModal } = useAppointment()
-
     return (
         <div className="hidden md:flex items-center justify-between bg-forest text-white px-6 py-2.5">
             {/* Left: Phone + Email */}
@@ -30,15 +28,15 @@ export function TopBar() {
                 </a>
             </div>
 
-            {/* Right: CTA — opens appointment modal */}
-            <button
-                onClick={() => openModal()}
-                className="flex items-center gap-2 bg-gold text-forest rounded-full hover:brightness-110 transition-all duration-200 cursor-pointer"
-                style={{ padding: "6px 18px", fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)", fontSize: "13px", fontWeight: 600, border: "none" }}
+            {/* Right: CTA */}
+            <Link
+                href="/appointment"
+                className="flex items-center gap-2 bg-gold text-forest rounded-full hover:brightness-110 transition-all duration-200"
+                style={{ padding: "6px 18px", fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)", fontSize: "13px", fontWeight: 600 }}
             >
                 Book an Appointment
                 <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            </Link>
         </div>
     )
 }

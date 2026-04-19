@@ -1,15 +1,14 @@
 "use client"
 
+import Link from "next/link"
 import { TopBar } from "@/components/layout/TopBar"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { specializations } from "@/data/staticData"
-import { useAppointment } from "@/context/AppointmentContext"
 import { ArrowRight } from "lucide-react"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 
 export default function SpecializationsPage() {
-    const { openModal } = useAppointment()
     const { ref, isVisible } = useScrollReveal(0.1)
 
     return (
@@ -77,13 +76,13 @@ export default function SpecializationsPage() {
                     <p className="text-white/80 text-lg mb-12 max-w-xl mx-auto">
                         Our personalised treatment approach can help restore your health naturally. Book your appointment today.
                     </p>
-                    <button
-                        onClick={() => openModal()}
+                    <Link
+                        href="/appointment"
                         className="inline-flex items-center gap-3 px-10 py-4 bg-[#2D5016] text-white rounded-full font-bold text-lg transition-all duration-300 hover:bg-[#1a3a2a] hover:-translate-y-1 shadow-[0_10px_30px_rgba(45,80,22,0.3)] group border-2 border-white/20"
                     >
-                        Book Appointment 
+                        Book Appointment
                         <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-                    </button>
+                    </Link>
                 </div>
             </section>
 

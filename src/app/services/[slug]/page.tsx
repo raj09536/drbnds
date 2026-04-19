@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import { ArrowLeft, Phone } from "lucide-react"
-import { AppointmentModal } from "@/components/AppointmentModal"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 const SERVICES_DATA: Record<string, any> = {
@@ -258,11 +258,12 @@ export default function ServicePage() {
                     </p>
                     
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <AppointmentModal>
-                            <button className="bg-forest text-white px-10 py-4 rounded-full font-bold shadow-xl hover:bg-forest/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                                Book a Consultation
-                            </button>
-                        </AppointmentModal>
+                        <Link
+                            href="/appointment"
+                            className="bg-forest text-white px-10 py-4 rounded-full font-bold shadow-xl hover:bg-forest/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            Book a Consultation
+                        </Link>
                         
                         <a 
                             href="tel:+918191919949" 

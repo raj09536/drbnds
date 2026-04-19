@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { MapPin, Phone, Mail, ArrowUpRight } from "lucide-react"
 import { clinics } from "@/data/staticData"
-import { useAppointment } from "@/context/AppointmentContext"
 
 /* ─── SVG Icons ──────────────────────────────────────────────────────── */
 const FacebookIcon = () => (
@@ -112,16 +112,15 @@ const LegalModal = ({ title, onClose }: { title: string; onClose: () => void }) 
 export function Footer() {
     const currentYear = new Date().getFullYear()
     const [modal, setModal] = useState<"privacy" | "terms" | null>(null)
-    const { openModal } = useAppointment()
 
     const quickLinks = [
-        { label: "Home", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
-        { label: "About", action: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
-        { label: "Services", action: () => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }) },
-        { label: "Our Doctors", action: () => document.getElementById("doctors")?.scrollIntoView({ behavior: "smooth" }) },
-        { label: "Locations", action: () => document.getElementById("location")?.scrollIntoView({ behavior: "smooth" }) },
-        { label: "FAQ", action: () => document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" }) },
-        { label: "Book Appointment", action: () => openModal() },
+        { label: "Home", href: null as string | null, action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
+        { label: "About", href: null, action: () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }) },
+        { label: "Services", href: null, action: () => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }) },
+        { label: "Our Doctors", href: null, action: () => document.getElementById("doctors")?.scrollIntoView({ behavior: "smooth" }) },
+        { label: "Locations", href: null, action: () => document.getElementById("location")?.scrollIntoView({ behavior: "smooth" }) },
+        { label: "FAQ", href: null, action: () => document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" }) },
+        { label: "Book Appointment", href: "/appointment", action: null },
     ]
 
     const socialLinks = [
@@ -309,21 +308,37 @@ export function Footer() {
                         </h4>
                         <div className="flex flex-col gap-2.5">
                             {quickLinks.map((link) => (
-                                <button
-                                    key={link.label}
-                                    onClick={link.action}
-                                    className="text-left transition-all duration-200 hover:text-gold hover:translate-x-1 cursor-pointer"
-                                    style={{
-                                        fontFamily: "var(--font-dm-sans)",
-                                        fontSize: "13px",
-                                        color: "rgba(255,255,255,0.65)",
-                                        background: "none",
-                                        border: "none",
-                                        padding: "4px 0",
-                                    }}
-                                >
-                                    {link.label}
-                                </button>
+                                link.href ? (
+                                    <Link
+                                        key={link.label}
+                                        href={link.href}
+                                        className="text-left transition-all duration-200 hover:text-gold hover:translate-x-1"
+                                        style={{
+                                            fontFamily: "var(--font-dm-sans)",
+                                            fontSize: "13px",
+                                            color: "rgba(255,255,255,0.65)",
+                                            padding: "4px 0",
+                                        }}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ) : (
+                                    <button
+                                        key={link.label}
+                                        onClick={link.action!}
+                                        className="text-left transition-all duration-200 hover:text-gold hover:translate-x-1 cursor-pointer"
+                                        style={{
+                                            fontFamily: "var(--font-dm-sans)",
+                                            fontSize: "13px",
+                                            color: "rgba(255,255,255,0.65)",
+                                            background: "none",
+                                            border: "none",
+                                            padding: "4px 0",
+                                        }}
+                                    >
+                                        {link.label}
+                                    </button>
+                                )
                             ))}
                         </div>
                     </div>

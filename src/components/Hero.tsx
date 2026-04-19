@@ -1,9 +1,9 @@
 "use client"
 
 import { ArrowRight, ChevronDown } from "lucide-react"
+import Link from "next/link"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { useCountUp } from "@/hooks/useCountUp"
-import { useAppointment } from "@/context/AppointmentContext"
 
 const formatHeroStat = (n: number) => {
     if (n >= 1000000) return (n / 100000).toFixed(0) + "L"
@@ -13,7 +13,6 @@ const formatHeroStat = (n: number) => {
 
 export function Hero() {
     const { ref, isVisible } = useScrollReveal(0.1)
-    const { openModal } = useAppointment()
 
     const patientsCount = useCountUp(100000, 2200, isVisible)
     const yearsCount = useCountUp(15, 1800, isVisible)
@@ -103,20 +102,19 @@ export function Hero() {
                             className={`flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center mt-10 md:mt-12 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
                             style={{ transitionDelay: "450ms" }}
                         >
-                            <button
-                                onClick={() => openModal()}
-                                className="group flex items-center justify-center gap-3 bg-gold text-forest rounded-xl hover:brightness-110 transition-all duration-300 cursor-pointer min-h-[52px] md:min-h-[58px]"
+                            <Link
+                                href="/appointment"
+                                className="group flex items-center justify-center gap-3 bg-gold text-forest rounded-xl hover:brightness-110 transition-all duration-300 min-h-[52px] md:min-h-[58px]"
                                 style={{
                                     padding: "16px 36px",
                                     fontFamily: "var(--font-dm-sans)",
                                     fontSize: "15px",
                                     fontWeight: 700,
-                                    border: "none",
                                 }}
                             >
                                 Book a Consultation
                                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                            </button>
+                            </Link>
                             <button
                                 onClick={scrollToServices}
                                 className="flex items-center justify-center gap-3 text-white rounded-xl transition-all duration-300 hover:bg-white/10 cursor-pointer min-h-[52px] md:min-h-[58px]"

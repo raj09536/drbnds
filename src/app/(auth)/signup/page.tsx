@@ -47,7 +47,7 @@ function PatientAuthPage() {
             return
         }
         toast.success("Welcome back!")
-        router.push("/patient-dashboard")
+        router.push("/")
     }
 
     // ── SIGNUP ─────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ function PatientAuthPage() {
         if (err) { setError(err.message); setLoading(false); return }
         if (data.user) {
             toast.success("Account verified! Welcome.")
-            router.push("/patient-dashboard")
+            router.push("/")
         }
     }
 
