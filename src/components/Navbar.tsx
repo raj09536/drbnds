@@ -364,7 +364,7 @@ export function Navbar() {
                                             <div key={item.product.id} className="flex gap-3 items-start">
                                                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#f5f0e8] shrink-0">
                                                     <img
-                                                        src={item.product.image}
+                                                        src={item.product.image_url}
                                                         alt={item.product.name}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -380,7 +380,7 @@ export function Navbar() {
                                                         className="text-[#1a3a2a60] text-[11px] mt-0.5"
                                                         style={{ fontFamily: "var(--font-dm-sans)" }}
                                                     >
-                                                        {item.product.packSize} · {item.product.brand}
+                                                        {item.product.weight} · {item.product.brand}
                                                     </p>
                                                     <div className="flex items-center justify-between mt-2">
                                                         {/* Qty controls */}
