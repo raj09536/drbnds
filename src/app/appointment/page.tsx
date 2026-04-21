@@ -10,9 +10,10 @@ import { supabase } from "@/lib/supabase"
 
 type ClinicId = "dehradun" | "bijnor"
 type ConsultationType = "in-clinic" | "phone" | "video"
-type Session = "morning" | "evening"
+type Session = "morning" | "evening" | "afternoon"
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const DEHRADUN_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const BIJNOR_DAYS = ["Tuesday", "Wednesday"]
 
 const CLINICS = [
     {
@@ -21,7 +22,7 @@ const CLINICS = [
         address: "Rajpur Road, Dehradun, Uttarakhand",
         phone: "+91-8191919949",
         doctors: [
-            { id: "bnd", name: "Dr. B.N. Dwivedy", photo: "/doctor.jpeg", spec: "Classical Homoeopathy" },
+            { id: "bnd", name: "Dr. B. N. Dwivedy", photo: "/doctor.jpeg", spec: "Classical Homoeopathy" },
             { id: "hb", name: "Dr. Himanshu Bhandari", photo: "/second_doctor.jpeg", spec: "Psychotherapy & Homoeopathy" },
         ],
     },
@@ -31,7 +32,7 @@ const CLINICS = [
         address: "Dhampur Road, Bijnor, Uttar Pradesh",
         phone: "+91-9997954989",
         doctors: [
-            { id: "bnd", name: "Dr. B.N. Dwivedy", photo: "/doctor.jpeg", spec: "Classical Homoeopathy" },
+            { id: "bnd", name: "Dr. B. N. Dwivedy", photo: "/doctor.jpeg", spec: "Classical Homoeopathy" },
         ],
     },
 ]
@@ -57,7 +58,7 @@ export default function AppointmentPage() {
     const handleClinicSelect = (id: ClinicId) => {
         setSelectedClinic(id)
         if (id === "bijnor") {
-            setSelectedDoctor("Dr. B.N. Dwivedy")
+            setSelectedDoctor("Dr. B. N. Dwivedy")
             setStep(3)
         } else {
             setSelectedDoctor("")
@@ -84,14 +85,23 @@ export default function AppointmentPage() {
             // proceed even if DB fails
         }
 
-        const msg = `Hello Dr. BND's Clinic! 🌿\n\nNew Appointment Request:\n\n👤 Name: ${form.name}\n📞 Phone: ${form.phone}\n📧 Email: ${form.email}\n\n🏥 Clinic: ${clinic?.name}\n👨‍⚕️ Doctor: ${selectedDoctor}\n💬 Consultation: ${consultationType}\n📅 Preferred Day: ${preferredDay} (${preferredSession})\n\n🩺 Health Concern:\n${form.healthConcern}\n\nPlease confirm my appointment. Thank you!`
+        const msg = `Hello Dr. BND's Clinic! 🌿\n\nNew Appointment Request:\n\n👤 Name: ${form.name}\n📞 Phone: ${form.phone}\n📧 Email: ${form.email}\n\n🏥 Clinic: ${clinic?.name}\n👨‍⚕️ Doctor: ${selectedDoctor}\n💬 Consultation: ${consultationType}\n📅 Preferred Day: ${preferredDay} (${sessionLabel(preferredSession)})\n\n🩺 Health Concern:\n${form.healthConcern}\n\nPlease confirm my appointment. Thank you!`
 
         window.open(`https://wa.me/918191919949?text=${encodeURIComponent(msg)}`, "_blank")
         router.push("/appointment/success")
     }
 
+    const isBijnor = selectedClinic === "bijnor"
     const isSunday = preferredDay === "Sunday"
+    const availableDays = isBijnor ? BIJNOR_DAYS : DEHRADUN_DAYS
     const canConfirm = preferredDay && preferredSession && !submitting
+
+    const sessionLabel = (s: Session | null) => {
+        if (!s) return ""
+        if (s === "morning") return "10 AM – 1:30 PM"
+        if (s === "evening") return "5 PM – 8 PM"
+        return "3 PM – 7 PM"
+    }
 
     return (
         <main className="min-h-screen bg-[#FAFAF7]">
@@ -298,11 +308,20 @@ export default function AppointmentPage() {
 
                             <div className="mb-8">
                                 <p className="text-[12px] font-bold uppercase tracking-[2px] text-[#1a3a2a70] mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>Day</p>
+                                {isBijnor && (
+                                    <p className="text-[12px] text-[#b45309] mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                                        ⚠️ Dr. Dwivedy visits Bijnor only on Tuesday & Wednesday (3 PM – 7 PM)
+                                    </p>
+                                )}
                                 <div className="flex flex-wrap gap-2">
-                                    {DAYS.map(day => (
+                                    {availableDays.map(day => (
                                         <button
                                             key={day}
-                                            onClick={() => { setPreferredDay(day); setPreferredSession(null) }}
+                                            onClick={() => {
+                                                setPreferredDay(day)
+                                                if (isBijnor) setPreferredSession("afternoon")
+                                                else setPreferredSession(null)
+                                            }}
                                             className="px-4 py-2.5 rounded-xl font-semibold text-[13px] transition-all cursor-pointer border"
                                             style={{
                                                 background: preferredDay === day ? "var(--forest, #1a3a2a)" : "white",
@@ -317,7 +336,7 @@ export default function AppointmentPage() {
                                 </div>
                             </div>
 
-                            {preferredDay && (
+                            {preferredDay && !isBijnor && (
                                 <div className="mb-8">
                                     <p className="text-[12px] font-bold uppercase tracking-[2px] text-[#1a3a2a70] mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>Session</p>
                                     <div className="flex flex-col gap-3">
@@ -349,6 +368,13 @@ export default function AppointmentPage() {
                                 </div>
                             )}
 
+                            {preferredDay && isBijnor && (
+                                <div className="mb-8 p-4 rounded-2xl border border-[#1a3a2a15]" style={{ background: "rgba(26,58,42,0.03)" }}>
+                                    <p className="font-bold text-[#1a3a2a] text-[14px]" style={{ fontFamily: "var(--font-dm-sans)" }}>🕒 Afternoon</p>
+                                    <p className="text-[#1a3a2a60] text-[13px] mt-0.5" style={{ fontFamily: "var(--font-dm-sans)" }}>3:00 PM – 7:00 PM</p>
+                                </div>
+                            )}
+
                             {/* Summary */}
                             {canConfirm && (
                                 <div className="mb-6 p-5 rounded-2xl" style={{ background: "rgba(26,58,42,0.04)", border: "1px solid rgba(26,58,42,0.1)" }}>
@@ -358,7 +384,7 @@ export default function AppointmentPage() {
                                         <p><span className="opacity-60">Clinic:</span> {clinic?.name}</p>
                                         <p><span className="opacity-60">Doctor:</span> {selectedDoctor}</p>
                                         <p><span className="opacity-60">Type:</span> {consultationType}</p>
-                                        <p><span className="opacity-60">Schedule:</span> {preferredDay}, {preferredSession === "morning" ? "10 AM – 1:30 PM" : "5 PM – 8 PM"}</p>
+                                        <p><span className="opacity-60">Schedule:</span> {preferredDay}, {sessionLabel(preferredSession)}</p>
                                     </div>
                                 </div>
                             )}

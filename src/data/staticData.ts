@@ -83,13 +83,13 @@ export const clinics = [
         map_embed:
             "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3516.0!2d78.5042171!3d29.3120453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390bc90066b7eb73%3Ae2754a8d5d6b0540!2sOcean%20hospital%20homoeopathic!5e0!3m2!1sen!2sin!4v1",
         timings: [
-            { day: "Monday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Tuesday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Wednesday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Thursday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Friday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Saturday", slots: ["10:00 AM – 1:30 PM", "5:00 PM – 8:00 PM"], closed: false },
-            { day: "Sunday", slots: ["10:00 AM – 1:30 PM"], closed: false },
+            { day: "Monday", slots: [], closed: true },
+            { day: "Tuesday", slots: ["3:00 PM – 7:00 PM"], closed: false },
+            { day: "Wednesday", slots: ["3:00 PM – 7:00 PM"], closed: false },
+            { day: "Thursday", slots: [], closed: true },
+            { day: "Friday", slots: [], closed: true },
+            { day: "Saturday", slots: [], closed: true },
+            { day: "Sunday", slots: [], closed: true },
         ],
     },
 ];

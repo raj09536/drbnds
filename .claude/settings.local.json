@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(curl -s \"http://localhost:3000/api/appointments?doctor=Dr.%20B.%20N.%20Dwivedy\")",
+      "Bash(python -m json.tool)"
+    ]
+  }
+}

@@ -92,12 +92,11 @@ export function Sidebar({ unavailability = [], onOpenSchedule }: SidebarProps) {
     const fetchCounts = useCallback(async () => {
         if (!doctor) return
 
-        // Pending Appointments
-        const { count: apptCount } = await supabase
-            .from('appointments')
-            .select('*', { count: 'exact', head: true })
-            .eq('doctor_id', doctor.doctor_id || doctor.id)
-            .eq('status', 'pending')
+        // Pending Appointments (via API to bypass RLS, filtered by doctor)
+        const name = encodeURIComponent(doctor?.name || "")
+        const apptRes = await fetch(`/api/appointments?doctor=${name}`)
+        const apptData = await apptRes.json()
+        const apptCount = Array.isArray(apptData) ? apptData.filter((a: any) => a.status === 'pending').length : 0
 
         // Unread Messages
         const { count: msgCount } = await supabase
@@ -145,7 +144,7 @@ export function Sidebar({ unavailability = [], onOpenSchedule }: SidebarProps) {
 
             // Subscriptions for badges
             const msgSub = supabase.channel('msg-counts').on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages' }, () => fetchCounts()).subscribe()
-            const apptSub = supabase.channel('appt-counts').on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => fetchCounts()).subscribe()
+            const apptSub = supabase.channel('appt-counts').on('postgres_changes', { event: '*', schema: 'public', table: 'public_appointments' }, () => fetchCounts()).subscribe()
             const feedSub = supabase.channel('feed-counts').on('postgres_changes', { event: '*', schema: 'public', table: 'feedback' }, () => fetchCounts()).subscribe()
 
             return () => {

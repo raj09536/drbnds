@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "@/components/dashboard/Sidebar"
 import { DashboardTopBar } from "@/components/dashboard/TopBar"
-import { supabase } from "@/lib/supabase"
 import { useDoctor } from "@/hooks/useDoctor"
 
 interface PublicAppointment {
@@ -42,12 +41,11 @@ export default function AppointmentsPage() {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
     const fetchAppointments = useCallback(async () => {
-        const { data } = await supabase
-            .from("public_appointments")
-            .select("*")
-            .order("created_at", { ascending: false })
-        setAppointments(data || [])
-    }, [])
+        const name = encodeURIComponent(doctor?.name || "")
+        const res = await fetch(`/api/appointments?doctor=${name}`)
+        const data = await res.json()
+        setAppointments(Array.isArray(data) ? data : [])
+    }, [doctor])
 
     useEffect(() => {
         if (!loading && !doctor) {
@@ -58,7 +56,11 @@ export default function AppointmentsPage() {
     }, [doctor, loading, router, fetchAppointments])
 
     const updateStatus = async (id: string, status: string) => {
-        await supabase.from("public_appointments").update({ status }).eq("id", id)
+        await fetch("/api/appointments", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, status }),
+        })
         setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
     }
 
@@ -145,7 +147,7 @@ export default function AppointmentsPage() {
                                                 <div className="flex flex-wrap gap-3 mt-2 text-[12px] text-[#6b7280]">
                                                     <span>🏥 {appt.clinic === "dehradun" ? "Dehradun Clinic" : "Bijnor Clinic"}</span>
                                                     <span>👨‍⚕️ {appt.doctor_name}</span>
-                                                    <span>📅 {appt.preferred_day} · {appt.preferred_session === "morning" ? "10 AM–1:30 PM" : "5 PM–8 PM"}</span>
+                                                    <span>📅 {appt.preferred_day} · {appt.preferred_session === "morning" ? "10 AM–1:30 PM" : appt.preferred_session === "afternoon" ? "3 PM–7 PM" : "5 PM–8 PM"}</span>
                                                 </div>
                                             </div>
 

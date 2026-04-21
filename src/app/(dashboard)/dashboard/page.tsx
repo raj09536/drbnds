@@ -14,14 +14,13 @@ interface Appointment {
     patient_name: string
     patient_phone: string
     patient_email: string
-    patient_location: string
-    reason: string
-    appointment_date: string
-    time_slot: string
-    mode: string
+    health_concern: string
+    clinic: string
+    doctor_name: string
+    consultation_type: string
+    preferred_day: string
+    preferred_session: string
     status: string
-    doctor_id: number
-    clinic_id: number
     created_at: string
 }
 interface Message {
@@ -42,7 +41,6 @@ interface DoctorUnavailability {
     reason: string
     updated_at: string
 }
-
 /* ─── SVG Icons ──────────────────────────────────────────────────────── */
 const CalIcon = () => (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -109,7 +107,6 @@ export default function DashboardPage() {
     const router = useRouter()
     const [appointments, setAppointments] = useState<Appointment[]>([])
     const [messages, setMessages] = useState<Message[]>([])
-    const [unavailability, setUnavailability] = useState<DoctorUnavailability[]>([])
     const [scheduleModalDocId, setScheduleModalDocId] = useState<number | null>(null)
     const [loadingData, setLoadingData] = useState(true)
 
@@ -117,33 +114,21 @@ export default function DashboardPage() {
     const fetchData = useCallback(async () => {
         if (!doctor) return
         setLoadingData(true)
-        const todayStr = new Date().toISOString().split('T')[0]
 
-        // Fetch Appointments (Today & Upcoming)
-        const { data: appts } = await supabase
-            .from('appointments')
-            .select('*')
-            .eq('doctor_id', doctor.doctor_id || doctor.id)
-            .gte('appointment_date', todayStr)
-            .order('appointment_date', { ascending: true })
-            .order('time_slot', { ascending: true })
+        // Fetch Appointments via API (bypasses RLS, filtered by doctor)
+        const name = encodeURIComponent(doctor?.name || "")
+        const res = await fetch(`/api/appointments?doctor=${name}`)
+        const appts = await res.json()
 
         // Fetch Messages
         const { data: msgs } = await supabase
             .from('contact_messages')
             .select('*')
-            .eq('clinic_id', doctor.clinic_id)
             .order('created_at', { ascending: false })
             .limit(5)
 
-        // Fetch Unavailability
-        const { data: unavail } = await supabase
-            .from('doctor_unavailability')
-            .select('*')
-
-        setAppointments(appts || [])
+        setAppointments(Array.isArray(appts) ? appts : [])
         setMessages(msgs || [])
-        setUnavailability(unavail || [])
         setLoadingData(false)
     }, [doctor])
 
@@ -160,8 +145,8 @@ export default function DashboardPage() {
         if (!doctor) return
         const channel = supabase
             .channel(`dash-main-${doctor.doctor_id || doctor.id}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `doctor_id=eq.${doctor.doctor_id || doctor.id}` }, () => fetchData())
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages', filter: `clinic_id=eq.${doctor.clinic_id}` }, () => fetchData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'public_appointments' }, () => fetchData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages' }, () => fetchData())
             .subscribe()
 
         return () => { supabase.removeChannel(channel) }
@@ -173,14 +158,12 @@ export default function DashboardPage() {
             if (!window.confirm('Cancel this appointment?')) return
         }
 
-        const { error } = await supabase
-            .from("appointments")
-            .update({ status })
-            .eq("id", id)
-
-        if (!error) {
-            setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
-        }
+        await fetch('/api/appointments', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status }),
+        })
+        setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
     }
 
     /* ── UI Constants ── */
@@ -199,10 +182,12 @@ export default function DashboardPage() {
     }
 
     /* ── Stats ── */
-    const todayTotal = appointments.length
+    const todayStr = new Date().toDateString()
+    const todayTotal = appointments.filter(a => new Date(a.created_at).toDateString() === todayStr).length
     const confirmedCount = appointments.filter(a => a.status === 'confirmed').length
     const pendingCount = appointments.filter(a => a.status === 'pending').length
     const unreadMessages = messages.filter(m => !m.is_read).length
+    const todayAppointments = appointments.filter(a => new Date(a.created_at).toDateString() === todayStr)
 
     const statCards = [
         { label: "Today's Appointments", value: todayTotal, icon: CalIcon, iconBg: "rgba(26,58,42,0.08)", iconColor: "var(--forest)", numColor: "var(--forest)" },
@@ -226,7 +211,7 @@ export default function DashboardPage() {
         <div className="min-h-screen" style={{ background: "#f3f4f6" }}>
             <Sidebar
                 doctor={doctor}
-                unavailability={unavailability}
+                unavailability={[]}
                 messages={messages}
                 onOpenSchedule={(id) => setScheduleModalDocId(id)}
             />
@@ -264,22 +249,25 @@ export default function DashboardPage() {
                                 <table className="w-full min-w-[600px]">
                                     <thead>
                                         <tr className="border-b border-black/5">
-                                            {["Time", "Patient", "Actions"].map(h => (
+                                            {["Schedule", "Patient", "Actions"].map(h => (
                                                 <th key={h} className="text-left py-3 px-2 text-[10px] font-bold text-gray-400 uppercase tracking-[2px]">{h}</th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-black/5">
-                                        {appointments.map((appt) => (
+                                        {todayAppointments.map((appt) => (
                                             <tr key={appt.id} className="hover:bg-gray-50/50 transition-colors">
-                                                <td className="py-4 px-2 text-sm font-bold text-forest">{appt.time_slot}</td>
+                                                <td className="py-4 px-2 text-sm font-bold text-forest">
+                                                    {appt.preferred_day}<br />
+                                                    <span className="text-[11px] text-gray-400 font-medium">{appt.preferred_session === 'morning' ? '10AM–1:30PM' : '5PM–8PM'}</span>
+                                                </td>
                                                 <td className="py-4 px-2">
                                                     <div className="flex items-center gap-3">
                                                         <div>
                                                             <p className="text-sm font-bold text-gray-900">{appt.patient_name}</p>
                                                             <p className="text-[11px] text-gray-400 font-medium">{appt.patient_phone}</p>
                                                         </div>
-                                                        {['completed', 'cancelled', 'rescheduled'].includes(appt.status) && statusBadge(appt.status)}
+                                                        {['confirmed', 'cancelled'].includes(appt.status) && statusBadge(appt.status)}
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-2">
@@ -300,36 +288,13 @@ export default function DashboardPage() {
                                                                 </button>
                                                             </>
                                                         )}
-
-                                                        {appt.status === 'confirmed' && (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => handleStatusUpdate(appt.id, 'completed')}
-                                                                    style={{ ...btnBase, background: '#1a3a2a', color: 'white', borderColor: '#1a3a2a' }}
-                                                                >
-                                                                    ✓ Complete
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => router.push('/dashboard/appointments')}
-                                                                    style={{ ...btnBase, background: '#f3f0ff', color: '#7c3aed', borderColor: '#8b5cf6' }}
-                                                                >
-                                                                    ↺ Reschedule
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleStatusUpdate(appt.id, 'cancelled')}
-                                                                    style={{ ...btnBase, background: '#fde8e4', color: '#c4715a', borderColor: '#ef4444' }}
-                                                                >
-                                                                    ✕ Cancel
-                                                                </button>
-                                                            </>
-                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                {appointments.length === 0 && (
+                                {todayAppointments.length === 0 && (
                                     <div className="py-12 text-center">
                                         <p className="text-sm font-bold text-gray-300">No appointments for today.</p>
                                     </div>
@@ -377,7 +342,7 @@ export default function DashboardPage() {
             {scheduleModalDocId !== null && (
                 <ScheduleModal
                     doctorId={scheduleModalDocId}
-                    unavailability={unavailability.find((u) => u.doctor_id === scheduleModalDocId) || { doctor_id: scheduleModalDocId, blocked_dates: [], blocked_slots: {}, reason: "", updated_at: "" }}
+                    unavailability={{ doctor_id: scheduleModalDocId, blocked_dates: [], blocked_slots: {}, reason: "", updated_at: "" }}
                     onSave={() => fetchData()}
                     onClose={() => setScheduleModalDocId(null)}
                 />
