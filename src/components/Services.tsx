@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { services } from "@/data/staticData"
 import { useRouter } from "next/navigation"
@@ -96,25 +95,6 @@ export function Services() {
                         </p>
                     </div>
 
-                    {/* Arrow Buttons */}
-                    <div className="flex gap-3 mt-6 sm:mt-0">
-                        <button
-                            onClick={handlePrev}
-                            disabled={currentIndex === 0}
-                            className={`flex items-center justify-center bg-white shadow-md rounded-full transition-all duration-200 w-11 h-11 ${currentIndex === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-forest hover:text-white cursor-pointer"}`}
-                            aria-label="Previous"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={handleNext}
-                            disabled={currentIndex >= services.length - visibleCount}
-                            className={`flex items-center justify-center bg-white shadow-md rounded-full transition-all duration-200 w-11 h-11 ${currentIndex >= services.length - visibleCount ? "opacity-50 cursor-not-allowed" : "hover:bg-forest hover:text-white cursor-pointer"}`}
-                            aria-label="Next"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
-                    </div>
                 </div>
 
                 {/* Slider Wrapper */}

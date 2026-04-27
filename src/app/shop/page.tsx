@@ -132,26 +132,36 @@ export default function ShopPage() {
             <TopBar />
             <Navbar />
 
-            <section className="relative overflow-hidden">
-                {/* Full image — no crop */}
-                <img
-                    src="/medical.jpg"
-                    alt="Wellness Store"
-                    className="w-full block"
-                    style={{ objectFit: "contain" }}
-                />
-                {/* Overlay with text centered on image */}
-                <div className="absolute inset-0 flex items-center justify-center text-center px-6" style={{ background: "rgba(26,58,42,0.55)" }}>
-                    <div>
-                        <span className="inline-block text-[#7fb99a] font-bold uppercase tracking-[4px] mb-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px" }}>
-                            Natural Healing
-                        </span>
-                        <h1 className="text-white font-bold leading-tight" style={{ fontFamily: "var(--font-cormorant, 'Cormorant Garamond', serif)", fontSize: "clamp(34px, 5vw, 56px)" }}>
-                            Our Wellness Store
-                        </h1>
-                        <p className="mt-4 text-white/80 max-w-xl mx-auto" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", lineHeight: 1.7 }}>
-                            Curated homoeopathic remedies and wellness products — trusted by thousands, recommended by our doctors.
-                        </p>
+            {/* Hero */}
+            <section className="pt-28 pb-14 px-4" style={{ background: "linear-gradient(135deg, #f5f0e8 0%, #eef4ef 100%)" }}>
+                <div className="container mx-auto max-w-4xl text-center">
+                    <span className="inline-block font-bold uppercase tracking-[4px] mb-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "11px", color: "var(--gold, #c9a84c)" }}>
+                        Natural Healing
+                    </span>
+                    <h1 className="font-bold leading-tight mb-4" style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(36px, 5vw, 60px)", color: "var(--forest, #1a3a2a)" }}>
+                        Our Wellness Store
+                    </h1>
+                    <p className="max-w-xl mx-auto mb-10" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "15px", lineHeight: 1.8, color: "#4a6a5a" }}>
+                        Curated homoeopathic remedies and wellness products — trusted by thousands, recommended by our doctors.
+                    </p>
+
+                    {/* Clinic Credentials */}
+                    <div className="inline-flex flex-wrap justify-center gap-x-8 gap-y-3 px-8 py-4 rounded-2xl" style={{ background: "white", border: "1px solid rgba(26,58,42,0.1)", boxShadow: "0 2px 16px rgba(26,58,42,0.06)" }}>
+                        <div className="flex items-center gap-2">
+                            <span style={{ color: "var(--gold, #c9a84c)", fontSize: "16px" }}>✦</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#6b7280", fontWeight: 600 }}>GSTIN</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#1a3a2a", fontWeight: 700 }}>05ABPPD3037L12N</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span style={{ color: "var(--gold, #c9a84c)", fontSize: "16px" }}>✦</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#6b7280", fontWeight: 600 }}>Reg. No.</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#1a3a2a", fontWeight: 700 }}>UK23HMD100000024</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span style={{ color: "var(--gold, #c9a84c)", fontSize: "16px" }}>✦</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#6b7280", fontWeight: 600 }}>Contact</span>
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "12px", color: "#1a3a2a", fontWeight: 700 }}>8191919949 · 9997954989</span>
+                        </div>
                     </div>
                 </div>
             </section>

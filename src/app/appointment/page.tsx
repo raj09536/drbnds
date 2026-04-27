@@ -19,7 +19,7 @@ const CLINICS = [
     {
         id: "dehradun" as ClinicId,
         name: "Dehradun Clinic",
-        address: "Rajpur Road, Dehradun, Uttarakhand",
+        address: "Jogiwala Ring Road, Dehradun, Uttarakhand",
         phone: "+91-8191919949",
         doctors: [
             { id: "bnd", name: "Dr. B. N. Dwivedy", photo: "/doctor.jpeg", spec: "Classical Homoeopathy" },

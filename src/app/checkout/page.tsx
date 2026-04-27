@@ -8,10 +8,12 @@ import { Footer } from "@/components/Footer"
 import { useCart } from "@/context/CartContext"
 import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
-import { AlertCircle, Banknote, Smartphone, ShoppingBag } from "lucide-react"
+import { AlertCircle, Banknote, Smartphone, ShoppingBag, Copy, Check } from "lucide-react"
 import Link from "next/link"
 
 type PaymentType = 'cod' | 'upi'
+
+const UPI_ID = "dhms9412175651@iob"
 
 function buildWhatsAppUrl(
     orderNumber: string,
@@ -49,10 +51,13 @@ ${itemLines}
 ${itemLines}
 
 💰 Subtotal: ₹${subtotal}
-🚚 Delivery: Please confirm charge
+🚚 Delivery: To be confirmed
 💳 Payment: UPI / PREPAID
 
-⚠️ Please send your UPI QR code to the customer and collect payment screenshot. Confirm delivery charge separately.`
+📸 PAYMENT SCREENSHOT ATTACHED
+UPI ID: ${UPI_ID}
+
+⚠️ Please confirm order & delivery charge.`
 
     const message = paymentType === 'cod' ? codMsg : upiMsg
     return `https://wa.me/918191919949?text=${encodeURIComponent(message)}`
@@ -66,6 +71,13 @@ export default function CheckoutPage() {
     const [paymentType, setPaymentType] = useState<PaymentType>('cod')
     const [errors, setErrors] = useState<Partial<typeof form>>({})
     const [submitting, setSubmitting] = useState(false)
+    const [copied, setCopied] = useState(false)
+
+    const copyUpiId = () => {
+        navigator.clipboard.writeText(UPI_ID)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+    }
 
     const validate = () => {
         const errs: Partial<typeof form> = {}
@@ -96,7 +108,7 @@ export default function CheckoutPage() {
                     customer_phone: form.phone.trim(),
                     delivery_address: deliveryAddress,
                     payment_type: paymentType,
-                    payment_status: paymentType === 'cod' ? 'pending' : 'awaiting_payment',
+                    payment_status: 'pending',
                     order_status: 'pending',
                     subtotal: cartTotal,
                     delivery_charge: 0,
@@ -220,6 +232,54 @@ export default function CheckoutPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* UPI QR Section */}
+                            {paymentType === 'upi' && (
+                                <div className="bg-white rounded-2xl border border-[#1a3a2a08] p-6 md:p-8">
+                                    <h2 className="font-bold text-[#1a3a2a] mb-2" style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "22px" }}>Scan & Pay</h2>
+                                    <p className="text-[#1a3a2a70] text-[13px] mb-6" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                                        Scan the QR code below using any UPI app (PhonePe, GPay, Paytm, etc.)
+                                    </p>
+
+                                    <div className="flex flex-col sm:flex-row gap-6 items-center">
+                                        {/* QR Code */}
+                                        <div className="shrink-0 p-3 border-2 border-[#1a3a2a15] rounded-2xl bg-white">
+                                            <img
+                                                src="/upi-qr.png"
+                                                alt="UPI QR Code"
+                                                width={180}
+                                                height={180}
+                                                className="rounded-xl"
+                                            />
+                                        </div>
+
+                                        {/* UPI ID + Steps */}
+                                        <div className="flex-1 w-full">
+                                            <p className="text-[11px] font-bold uppercase tracking-[2px] text-[#1a3a2a60] mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>UPI ID</p>
+                                            <div className="flex items-center gap-2 mb-5 p-3 rounded-xl bg-[#f5f0e8] border border-[#1a3a2a10]">
+                                                <span className="flex-1 text-[14px] font-bold text-[#1a3a2a]" style={{ fontFamily: "var(--font-dm-sans)" }}>{UPI_ID}</span>
+                                                <button type="button" onClick={copyUpiId} className="shrink-0 p-1.5 rounded-lg hover:bg-[#1a3a2a10] transition-colors cursor-pointer">
+                                                    {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-[#1a3a2a60]" />}
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-2.5">
+                                                {[
+                                                    { n: "1", t: "Scan QR or copy UPI ID above" },
+                                                    { n: "2", t: "Pay the subtotal amount" },
+                                                    { n: "3", t: "Take a screenshot of payment" },
+                                                    { n: "4", t: "Click \"Place Order\" — WhatsApp opens, send your screenshot there" },
+                                                ].map(s => (
+                                                    <div key={s.n} className="flex items-start gap-3">
+                                                        <span className="w-5 h-5 rounded-full text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5" style={{ background: "var(--forest, #1a3a2a)", fontFamily: "var(--font-dm-sans)" }}>{s.n}</span>
+                                                        <p className="text-[13px] text-[#1a3a2a]" style={{ fontFamily: "var(--font-dm-sans)" }}>{s.t}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Submit button — mobile only */}
                             <button
